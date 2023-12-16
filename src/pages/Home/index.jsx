@@ -21,7 +21,7 @@ export default function Home() {
 
   const getOrders = async () => {
     try {
-      const { data } = await apiService.get('/admin/orders-all');
+      const { data } = await apiService.get('/admin/orders-dashboard');
 
       const ordersByDate = data.reduce((acc, order) => {
         const dateWithoutTime = new Date(order.date).toLocaleDateString();

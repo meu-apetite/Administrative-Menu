@@ -16,7 +16,7 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-import ImageIntro from '../../../public/images/16548-min.jpg';
+import ImageIntro from 'assets/images/16548-min.jpg';
 import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
 
@@ -89,7 +89,7 @@ export default function Login() {
       console.log(data.get('password'))
 
       const response = await apiService.post(
-        '/login',
+        '/auth/login',
         { email: data.get('email'), password: data.get('password'), subscription: {} }
       );
 
@@ -166,9 +166,8 @@ export default function Login() {
                 <Grid item xs>
                   <Link href="#" variant="body2">Esqueceu a senha?</Link>
                 </Grid>
-
                 <Grid item>
-                  <Link href="/register" variant="body2">Não tem uma conta? Cadastre-se</Link>
+                  <Link href="/register" variant="body2">Cadastre-se</Link>
                 </Grid>
               </Grid>
 

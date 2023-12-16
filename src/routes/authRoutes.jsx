@@ -3,7 +3,7 @@ import Register from '../pages/Auth/Register';
 
 const authRoutes = [
   {
-    path: '/',
+    path: '/auth',
     children: [
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> }
