@@ -11,16 +11,16 @@ export const AuthProvider = (props) => {
 
   return (
     <AuthContext.Provider value={{ company, setCompany, token, setToken, loading, setLoading, toast }}>
-      <Backdrop
-        sx={{ color: '#000000', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+       <Backdrop
+        sx={{ color: '#000000', zIndex: (theme) => theme.zIndex.drawer + 100 }}
         open={loading}
       >
         <Box sx={{ display: 'grid', justifyContent: 'center', gap: 1 }}>
-          <CircularProgress sx={{ ml: '8px' }}/>
+          <CircularProgress size="4rem" sx={{ margin: 'auto' }} />
           <strong style={{ color: '#fff' }}>{loading}</strong>
         </Box>
       </Backdrop>
-      <Toaster position="bottom-right" reverseOrder={false} />
+      <Toaster position="top-center" reverseOrder={false} />
       {props.children}
     </AuthContext.Provider>
   );

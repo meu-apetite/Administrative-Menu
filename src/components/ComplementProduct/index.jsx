@@ -15,7 +15,7 @@ import { propsTextField } from 'utils/form';
 import * as S from './style';
 
 const ComplementProduct = ({ complementsValue, getValue }) => {
-  const initComplement = { name: '', max: 1, min: 0, isRequired: null, options: [{ name: '', price: 0 }] };
+  const initComplement = { name: '', max: 1, min: 0, isRequired: null, options: [{ name: '', price: null }] };
 
   const [complements, setComplements] = useState([...complementsValue]);
 
@@ -33,14 +33,14 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
 
   const addComplement = (index) => {
     const complementsCurrent = [...complements];
-    complementsCurrent[index]['options'].push({ name: '', price: 0, priceFormat: 0 });
+    complementsCurrent[index]['options'].push({ name: '', price: null, priceFormat: null });
     setComplements(complementsCurrent);
   };
 
   const addComplementGroup = () => setComplements([...complements, initComplement]);
 
   const removeComplementGroup = (index) => {
-    console.log(index);
+    // console.log(index);
     // setComplements([...complements, initComplement]);
   };
 
@@ -50,7 +50,6 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
       ['options'].filter((item, i) => i !== optionIndex);
     setComplements(complementsCurrent);
   };
-
 
   const validateData = () => {
     const errors = [];
@@ -111,7 +110,7 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
                   <Button
                     variant="outlined"
                     sx={{ display: 'flex', gap: 1 }}
-                    onClcik={() => removeComplementGroup(index)}
+                    onClick={() => removeComplementGroup(index)}
                   >
                     <span className="fa fa-trash"></span> Remover grupo
                   </Button>
@@ -204,7 +203,13 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
                       value={complements[index]['options'][indexOption]['priceFormat']}
                       onChange={(e) => {
                         setValueOption(index, indexOption, 'priceFormat', maskFormat(e.target.value));
-                        setValueOption(index, indexOption, 'price', Number(e.target.value.replace('R$ ', '')));
+                        setValueOption(
+                          index, 
+                          indexOption, 
+                          'price', 
+                          parseFloat(
+                            complements[index]['options'][indexOption]['priceFormat'].replace('R$ ', ' '))
+                          );
                       }}
                     />
                     <S.ButtonRemoveOption color="error" onClick={() => removeOption(index, indexOption)}>

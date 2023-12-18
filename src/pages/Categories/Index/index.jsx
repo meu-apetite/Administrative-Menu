@@ -7,6 +7,7 @@ import Header from 'components/Header';
 import { AuthContext } from 'contexts/auth';
 import { ApiService } from 'services/api.service';
 import * as S from './style';
+import ButtonFloat from 'components/ButtonFloat';
 
 const Index = () =>  {
   const label = { inputProps: { 'aria-label': 'Color switch demo' } };
@@ -53,12 +54,12 @@ const Index = () =>  {
       products[indexProduct]['displayPosition'] = products[indexProduct - 1]['displayPosition'];
       products[indexProduct - 1]['displayPosition'] = currentPosition;
       positions.push(indexProduct, (indexProduct - 1));
-      setProductChangeCurrent(indexProduct - 1);
+      setProductChangeCurrent(products[indexProduct]._id);
     } else if (action === 'down') {
       products[indexProduct]['displayPosition'] = products[indexProduct + 1]['displayPosition'];
       products[indexProduct + 1]['displayPosition'] = currentPosition;
       positions.push(indexProduct, (indexProduct + 1));
-      setProductChangeCurrent(indexProduct + 1);
+      setProductChangeCurrent(products[indexProduct]._id);
     }
 
     categoriesCurrent[indexCategory]['products'] = products;
@@ -112,7 +113,7 @@ const Index = () =>  {
 
   const save = async () => {
     try {
-      setLoading('Atualizando');
+      setLoading('Atualizando...');
 
       const data = categories
         .filter((item, i) => {
@@ -138,7 +139,7 @@ const Index = () =>  {
       sortPosition(response.data);
       toast.success('Categoria excluída com sucesso!');
     } catch (error) {
-      toast.error('Erro ao excluir categoria');
+      toast.error(error.response.data?.message || 'Não foi possível excluir a categoria');
       console.log(error);
     } finally {
       setLoading(false);
@@ -211,7 +212,8 @@ const Index = () =>  {
                 <S.CategoryItem
                   key={indexProduct}
                   style={{
-                    background: productChangeCurrent === indexProduct ? 'rgba(52, 152, 219, 0.1)' : ''
+                    background: productChangeCurrent === item._id 
+                      ? 'rgba(52, 152, 219, 0.1)' : ''
                   }}
                 >
                   <div className="wrapperInfo">
@@ -247,11 +249,9 @@ const Index = () =>  {
         ))}
 
         {categories.length ? (
-          <S.WrapperButtonSaved>
-            <Button variant='contained' onClick={save} disabled={!categoryChanges.length}>
-              Salvar alterações
-            </Button>
-          </S.WrapperButtonSaved>
+          <Box sx={{ mb: '48px' }}>
+            <ButtonFloat text={'Salvar alterações'} onClick={save} />
+          </Box>
         ) : null}
       </S.ContainerCategories>
 

@@ -9,12 +9,18 @@ import { ApiService } from 'services/api.service';
 import { Button, MenuItem } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
 import { colorOptions } from 'utils/colorsOptions';
+import ButtonFloat from 'components/ButtonFloat';
+import { SketchPicker } from 'react-color';
+
+
+const colors = [
+  '#2C3E50', '#34495E', '#7F8C8D', '#1F618D', '#8E44AD',
+  '#2E4053', '#5D6D7E', '#4A235A', '#515A5A', '#3498DB'
+];
 
 const Create = () => {
   const apiService = new ApiService();
-
   const { toast, setLoading } = useContext(AuthContext);
-
   const [logo, setLogo] = useState();
   const [gallery, setGallery] = useState([]);
   const [data, setData] = useState({
@@ -23,6 +29,12 @@ const Create = () => {
     description: '',
     custom: { googleMapUrl: '' }
   });
+  const [color, setColor] = useState('#000000'); // Cor padrão inicial
+  const [displayColorPicker, setDisplayColorPicker] = useState(false);
+
+  const handleClose = () => setDisplayColorPicker(false);
+
+  const handleChange = (newColor) => setColor(newColor.hex);
 
   const formSubmit = async (e) => {
     e.preventDefault();
@@ -146,7 +158,7 @@ const Create = () => {
 
   return (
     <>
-      <Header title="Dados da loja" back={-1} />
+      <Header title="Aparência" back={-1} />
 
       <Box component="section" noValidate>
         <Grid container spacing={2}>
@@ -187,24 +199,27 @@ const Create = () => {
           </Grid>
           <>
             <Grid item xs={12} sm={12}>
-              Escolha cuidadosamente as cores que serão aplicadas em locais estratégicos 
-              de sua loja. Recomendamos tonalidades mais escuras, pois cores claras podem 
-              tornar algumas informações menos visíveis.
+          
             </Grid>
+           
             <Grid item xs={6} sm={6}>
-              <TextField
-                type="color"
-                label="Cor tema principal"
-                sx={{ width: '100%' }}
-              />
-            </Grid>
-            <Grid item xs={6} sm={6}>
-              <TextField
-                type="color"
-                label="Cor tema secundária"
-                sx={{ width: '100%' }}
-              />
-            </Grid>
+      <div style={{ position: 'relative' }}>
+        <TextField
+          type="text"
+          label="Cor tema secundária"
+          value={color}
+          // onClick={handleClick}
+          sx={{ width: '100%' }}
+        />
+        {displayColorPicker && (
+          <div style={{ position: 'absolute', zIndex: '2' }}>
+            <div onClick={handleClose} style={{ position: 'fixed', top: '0', right: '0', bottom: '0', left: '0' }} />
+            <SketchPicker color={color} onChange={handleChange} />
+          </div>
+        )}
+      </div>
+    </Grid>
+
           </>
           <Grid item xs={12} sm={12}>
             <label>Logomarca</label>
@@ -213,6 +228,8 @@ const Create = () => {
           </Grid>
         </Grid>
       </Box>
+
+      <ButtonFloat text={'salvar'} />
     </>
   );
 };

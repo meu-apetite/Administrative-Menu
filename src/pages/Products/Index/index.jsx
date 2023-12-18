@@ -1,28 +1,14 @@
-import { useState, useEffect, useContext, forwardRef } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Button, 
-  Pagination, 
-  Box, 
-  MenuItem, 
-  DialogContentText, 
-  DialogTitle, 
-  DialogContent, 
-  Dialog, 
-  DialogActions, 
-  Slide 
-} from '@mui/material';
+import { Button, Pagination, Box, MenuItem } from '@mui/material';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
 import Header from 'components/Header';
 import Menu from '@mui/material/Menu';
 import * as S from './style';
-
-const Transition = forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import ConfirmAction from 'components/ConfirmAction';
 
 export default function Index() {
   const apiService = new ApiService();
@@ -32,8 +18,7 @@ export default function Index() {
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
-  const [modalConfirm, setModalConfirm] = useState(false);
-  const [isComfirmDelete, setIsComfirmDelete] = useState(false);
+  const [itemDelete, setItemDelete] = useState(null);
 
   const getProducts = async () => {
     const { data } = await apiService.get(`/admin/products?page=1`);
@@ -76,9 +61,6 @@ export default function Index() {
 
   const deleteProduct = async (id) => {
     try {
-      setModalConfirm(true);
-      if (!isComfirmDelete) return;
-
       setLoading('Aguarde...');
       const { data } = await apiService.delete(`/admin/products/${id}/${company._id}`);
       setProducts(data?.reverse());
@@ -92,6 +74,10 @@ export default function Index() {
   };
 
   const toUpdate = (id) => navigate('/admin/products/update/' + id);
+
+  const toDuplicate = (product) => {
+    return navigate('/admin/products/create/', { state: { product, duplicate: true } });
+  }
 
   useEffect(() => {
     getProducts();
@@ -117,9 +103,9 @@ export default function Index() {
       )}
 
       <S.ContainerProducts>
-        {products.map((item) => {
+        {products.map((item, i) => {
           return (
-            <S.CardCustom>
+            <S.CardCustom key={'index-' + i}>
               <S.WrapperActions>
                 <PopupState variant="popover">
                   {(popupState) => (
@@ -129,13 +115,24 @@ export default function Index() {
                       </Button>
                       <Menu {...bindMenu(popupState)}>
                         <MenuItem onClick={() => toUpdate(item._id)}>
-                          <span className="fa fa-edit"></span> Editar
+                          <span className="fa fa-edit"></span>
+                          &#160;&#160;&#160;Editar
                         </MenuItem>
-                        <MenuItem onClick={popupState.close}>
-                          <span className="fa fa-copy"></span> Duplicar
+                        <MenuItem onClick={() => {
+                          toDuplicate(item);
+                          popupState.close();
+                        }}>
+                          <span className="fa fa-copy"></span> 
+                          &#160;&#160;&#160;Duplicar
                         </MenuItem>
-                        <MenuItem onClick={() => deleteProduct(item._id)}>
-                          <span className="fa fa-remove"></span> Excluir
+                        <MenuItem
+                          onClick={() => {
+                            setItemDelete(item._id);
+                            popupState.close();
+                          }}
+                        >
+                          <span className="fa fa-remove"></span> 
+                          &#160;&#160;&#160;&#160;Excluir
                         </MenuItem>
                       </Menu>
                     </>
@@ -183,38 +180,13 @@ export default function Index() {
         </div>
       )}
 
-      <Dialog
-        open={modalConfirm}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={() => setModalConfirm(false)}
-      >
-        <DialogTitle>Tem certeza de que deseja excluir este produto?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Esta ação é irreversível e a exclusão não poderá ser desfeita, 
-            portanto, certifique-se de sua decisão antes de confirmar.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button 
-            onClick={() => {
-              setIsComfirmDelete(false);
-              setModalConfirm(false);
-            }}
-          >
-            Cancelar
-          </Button>
-          <Button 
-            onClick={() => {
-              setIsComfirmDelete(true);
-              setModalConfirm(false);
-            }}
-          >
-            Confirmar
-          </Button> 
-        </DialogActions>
-      </Dialog>
+      <ConfirmAction
+        open={!!itemDelete}
+        confirm={async(isConfirm) => {
+          if (isConfirm) await deleteProduct(itemDelete);
+          itemDelete(false);
+        }}
+      />
     </Box>
   );
 }

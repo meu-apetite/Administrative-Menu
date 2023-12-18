@@ -1,65 +1,33 @@
 import { useContext, useEffect, useState } from 'react';
-import { Tab, Tabs, Grid, Box, TextField } from '@mui/material';
+import { Tab, Tabs, Box } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from 'contexts/auth';
 import { ApiService } from 'services/api.service';
-import { propsTextField } from 'utils/form';
-import { units } from 'utils/units';
-import Select from 'components/Select';
 import Header from 'components/Header';
 import ComplementProduct from 'components/ComplementProduct';
-import * as S from './style';
+import ButtonFloat from 'components/ButtonFloat';
+import FormProduct from 'components/FormProduct';
 
 const Create = () => {
   const apiService = new ApiService();
   const navigate = useNavigate();
   const { state } = useLocation();
   const { setLoading, toast } = useContext(AuthContext);
-  const [categories, setCategories] = useState([]);
-  const [gallery, setGallery] = useState([]);
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
   const [tabCurrent, setTabCurrent] = useState(0);
+  const [dataInit, setDataInit] = useState(null);
   const [data, setData] = useState({
     name: '',
     description: '',
     code: '',
     price: 0,
-    priceFormat: '',
     discountPrice: 0,
-    discountPriceFormat: '',
     status: true,
     category: '',
     unit: '',
     images: [],
   });
-  const [helperText, setHelperText] = useState({});
   const [complements, setComplements] = useState([]);
   const [complementsErrors, setComplementsErrors] = useState([]);
-
-  const loadImage = async (e) => {
-    if (e.target.files.length <= 0) return;
-    setGallery((arr) => [
-      { name: e.target.files[0]?.name, url: URL.createObjectURL(e.target.files[0]) }
-    ]);
-    setData({ ...data, images: [e.target.files[0]] });
-  };
-
-  const removeImage = (index) => {
-    setGallery([]);
-    setData({ ...data, images: [] });
-  };
-
-  const getCategories = async () => {
-    try {
-      const response = await apiService.get('/admin/categories');
-      const data = response.data;
-      setCategories(data.map((item) => ({ text: item.title, value: item._id })));
-      if (state?.categoryId) {
-        const find = data.findIndex(item => item._id === state.categoryId);
-        if (find >= 0) setData({ ...data, category: state.categoryId });
-      }
-    } catch (e) { }
-  };
 
   const createComplement = async () => {
     try {
@@ -68,48 +36,41 @@ const Create = () => {
     } catch (error) {
       toast.error(
         error.response.data?.message ||
-        'Não foi possível criar o complemento, verifique os dados e tente novamente',
+        'Não foi possível criar o complemento do produto',
       );
     }
   };
 
   const validateData = () => {
     let errors = 0;
-
-    const dataFrom = data;
-    setHelperText({});
+    const dataForm = data;
     setData({});
 
     if (!data.name.trim().length) {
-      setHelperText({ name: 'Preencha o campo' });
       toast.error('O nome do produto não pode ficar vazio');
       errors += 1;
     }
-
-    if (data.priceFormat) {
-      dataFrom.price = Number(data.priceFormat.replace('R$ ', ''));
-    } else if (!data.price || data.price >= 0) {
-      setHelperText((prev) => ({ ...prev, price: 'Preço é obrigatório' }));
+    if (isNaN(Number(data.price))) {
       toast.error('Preço é obrigatório');
       errors += 1;
+    } else {
+      Number(data.price) <= 0 
+        ? toast.error('Preço é deve ser maior que zero')
+        : dataForm.price = Number(data.price);
     }
-
     if (data.discountPriceFormat) {
-      dataFrom.discountPrice = Number(data.discountPriceFormat.replace('R$ ', ''));
+      dataForm.discountPrice = Number(data.discountPrice);
     }
-
     if (data.discountPrice && !data.discountPrice > 0) {
-      setHelperText((prev) => ({ ...prev, discountPrice: 'Preço inválido' }));
+      toast.error('Preço do desconto inválido');
       errors += 1;
     }
-
     if (!data.category) {
       toast.error('Selecione a categoria do produto');
       errors += 1;
     }
 
-    setData(dataFrom);
-
+    setData(dataForm);
     return errors ? false : true;
   };
 
@@ -119,17 +80,15 @@ const Create = () => {
     let complementInsertIds;
 
     if (complements.length) {
-      if (complementsErrors.length) {
-        toast.error(complementsErrors.join('\n\n'));
-        return;
-      }
-
+      if (complementsErrors.length) return toast.error(complementsErrors.join('\n\n'));
       complementInsertIds = await createComplement();
       if (complementInsertIds.success === false) {
         setLoading(false);
         return toast.error(complementInsertIds.message);
       }
     }
+
+    console.log(complementInsertIds)
 
     try {
       const formData = new FormData();
@@ -142,134 +101,54 @@ const Create = () => {
       formData.append('category', data.category);
       formData.append('unit', data.unit);
       if (complementInsertIds) formData.append('complements', JSON.stringify(complementInsertIds));
-      for (let i = 0; i < data.images.length; i++) {
-        formData.append('images', data.images[i]);
-      }
+      formData.append('images', data.images[0]);
 
+      setLoading('Salvando dados...');
       await apiService.post('/admin/products', formData, true);
 
       toast.success('Produto cadastrado');
-      setTimeout(() => navigate({ pathname: '/admin/products' }), 1000);
+      setTimeout(() => navigate({ pathname: '/admin/products' }), 700);
     } catch (error) {
+      toast.error(error.response.data?.message || 'Erro ao cadastrar produto');
+    } finally {
       setLoading(false);
-      if (error?.response?.data?.message) return toast.error(error?.response?.data?.message);
-      toast.error('Erro ao cadastrar produto');
-    } 
+    }
   };
 
-  const handleChange = (e, newValue) => setTabCurrent(newValue);
-
-  const maskFormat = (text) => {
-    const number = parseInt(text.replace(/\D/g, ''), 10);
-    if (isNaN(number)) return 'R$ 0.00';
-    return 'R$ ' + (number / 100).toFixed(2);
-  };
+  const handleChange = (e, v) => setTabCurrent(v);
 
   useEffect(() => {
-    getCategories();
+    if (state?.product) {
+      setDataInit({
+        name: state.product.name,
+        description: state.product.description || '',
+        code: state.product.code || '',
+        price: state.product.price?.toFixed(2) || 0,
+        discountPrice: state.product.discountPrice?.toFixed(2) || 0,
+        status: state.product.isActive,
+        category: state.product.category._id,
+        unit: state.product.unit,
+        images: []
+      });
+      console.log(state.product)
+      setComplements(state.product.complements);
+    }
   }, []);
 
   return (
-    <>
-      <Header
-        title="Novo produto"
-        back={-1}
-        buttonText="Salvar"
-        buttonClick={handleSubmit}
-        buttonDisabled={isSubmitDisabled}
-      />
+    <Box component="section">
+      <Header title="Novo produto" back={-1} />
 
       <Tabs value={tabCurrent} onChange={handleChange} variant="scrollable" >
-        <Tab label="Detalhes" /> 
+        <Tab label="Detalhes" />
         <Tab label="Complementos" />
       </Tabs>
 
-      <Box component="section">
+      <Box component="section" sx={{ mb: '48px' }}>
         {tabCurrent === 0 && (
-          <Grid container spacing={2} sx={{ mt: '1rem'}}>
-            <S.wrapperIntro>
-              <S.WrapperUpload>
-                {(gallery.length >= 1) && <span className="fa fa-close close" onClick={removeImage}></span>}
-                <label>
-                  {(gallery.length <= 0) && <button>clique aqui para add imagem</button>}
-                  <input accept="image/*" onChange={loadImage} type="file" />
-                  <S.ImageProduct src={gallery[0]?.url || 'https://spassodourado.com.br/wp-content/uploads/2015/01/default-placeholder.png'} />
-                </label>
-              </S.WrapperUpload>
-              <Grid item sm={12} sx={{ display: 'grid', gap: '1rem', m: 0 }}>
-                <TextField
-                  {...propsTextField}
-                  label="Nome"
-                  helperText={helperText?.name}
-                  required={true}
-                  value={data.name}
-                  onChange={(e) => setData({ ...data, name: e.target.value })}
-                />
-                <TextField
-                  {...propsTextField}
-                  helperText={helperText?.description}
-                  label="Descrição"
-                  multiline
-                  rows={3}
-                  value={data.description}
-                  onChange={(e) => setData({ ...data, description: e.target.value })}
-                />
-              </Grid>
-            </S.wrapperIntro>
-            <Grid item xs={6} sm={6}>
-              <TextField
-                label="Código"
-                helperText={helperText?.code}
-                value={data.code}
-                fullWidth={true}
-                onChange={(e) => setData({ ...data, code: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={6} sx={{ display: 'flex', alignItems: 'end', mb: '4px' }}>
-              <Select
-                data={[{ text: 'Ativo', value: true }, { text: 'Desativo', value: false }]}
-                label="Status"
-                value={data.status}
-                onChange={(e) => setData({ ...data, status: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={6} sx={{ display: 'flex', alignItems: 'end', mb: '4px', mt: '10px' }}>
-              <TextField
-                sx={{ width: '100%' }}
-                label="Preço"
-                helperText={helperText?.priceFormat}
-                required={true}
-                value={data.priceFormat}
-                onChange={(e) => setData({ ...data, priceFormat: maskFormat(e.target.value) })}
-              />
-            </Grid>
-            <Grid item xs={6} sx={{ display: 'flex', alignItems: 'end', mb: '4px' }}>
-              <TextField
-                sx={{ width: '100%' }}
-                helperText={helperText?.discountPrice}
-                label="Preço com desconto"
-                name="discountPrice"
-                value={data.discountPriceFormat}
-                onChange={(e) => setData({ ...data, discountPriceFormat: maskFormat(e.target.value) })}
-              />
-            </Grid>
-            <Grid item xs={12} sx={{ mt: 1.1 }}>
-              <Select
-                value={data.unit}
-                data={units}
-                label="Unidade de medida"
-                onChange={(e) => setData({ ...data, unit: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sx={{ mt: 1.1, mb: 1.1 }}>
-              <Select
-                value={data.category}
-                data={categories}
-                label="Categoria *"
-                onChange={(e) => setData({ ...data, category: e.target.value })}
-              />
-            </Grid>
-          </Grid>
+          (state?.duplicate) 
+            ? dataInit && <FormProduct initialData={dataInit} getData={data => setData(data)} />
+            : <FormProduct initialData={data} getData={data => setData(data)} />
         )}
 
         {tabCurrent === 1 && (
@@ -284,7 +163,9 @@ const Create = () => {
           </section>
         )}
       </Box>
-    </>
+
+      <ButtonFloat text="Salvar" onClick={() => handleSubmit()} />
+    </Box>
   );
 };
 

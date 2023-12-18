@@ -33,7 +33,7 @@ export class ApiService {
 
 
   verifyAuthetication(response) {
-    if (response.status === 401 && this.isAuth) {
+    if (response.status == 401 && this.isAuth) {
       return window.location.href = '/auth/login'
     }
   }

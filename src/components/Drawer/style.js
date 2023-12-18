@@ -9,7 +9,7 @@ export const openedMixin = (theme) => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: 'hidden',
-  zIndex: 2
+  zIndex: theme.zIndex.drawer + 2
 })
 
 export const closedMixin = (theme) => ({

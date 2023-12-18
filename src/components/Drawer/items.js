@@ -37,9 +37,9 @@ const items = [
     },
 
     {
-      text: 'Loja',
+      text: 'Aparência',
       link: '/admin/appearance',
-      Icon: () => <i className="fas fa-store"></i>,
+      Icon: () => <i className="fas fa-paint-brush"></i>,
     },
 
     {

@@ -2,7 +2,6 @@ import { useRoutes } from 'react-router-dom';
 import { AuthProvider } from 'contexts/auth';
 import authRoutes from 'routes/authRoutes';
 import adminRoutes from 'routes/adminRoutes';
-import { StoreProvider } from 'contexts/store';
 import theme from 'theme/default';
 import { ThemeProvider } from '@mui/material';
 
