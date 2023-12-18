@@ -17,7 +17,7 @@ import Register from '../pages/Auth/Register';
 
 const adminRoutes = [
   {
-    path: '/',
+    path: '/admin',
     element: <Layout />,
     exact: true,
     children: [
