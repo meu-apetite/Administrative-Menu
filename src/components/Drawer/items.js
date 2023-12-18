@@ -2,49 +2,49 @@ const items = [
   [
     {
       text: 'Início',
-      link: '/admin',
+      link: '/',
       Icon: () => <i className="fas fa-home"></i>,
     },
 
     {
       text: 'Categoria',
-      link: '/admin/categories',
+      link: '/categories',
       Icon: () => <i className="fas fa-tags"></i>,
     },
 
     {
       text: 'Produtos',
-      link: '/admin/products',
+      link: '/products',
       Icon: () => <i className="fas fa-cube"></i>,
     },
 
     {
       text: 'Pedidos',
-      link: '/admin/orders',
+      link: '/orders',
       Icon: () => <i className="fas fa-shopping-cart"></i>,
     },
 
     {
       text: 'Formas de pagamento',
-      link: '/admin/payment-method',
+      link: '/payment-method',
       Icon: () => <i className="fas fa-money-bill"></i>
     },
 
     {
       text: 'Endereço',
-      link: '/admin/address',
+      link: '/address',
       Icon: () => <i className="fas fa-map-location"></i>,
     },
 
     {
       text: 'Aparência',
-      link: '/admin/appearance',
+      link: '/appearance',
       Icon: () => <i className="fas fa-paint-brush"></i>,
     },
 
     {
       text: 'Configurações',
-      link: '/admin/settings',
+      link: '/settings',
       Icon: () => <i className="fas fa-cog"></i>,
     },
     
