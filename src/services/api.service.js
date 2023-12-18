@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export class ApiService {
-  // #baseUrl = 'https://meuapetite.com/api';
-  #baseUrl = 'http://192.168.0.135:5000/api';
+  #baseUrl = 'https://meuapetite.com/api';
+  // #baseUrl = 'http://192.168.0.135:5000/api';
 
   isAuth = false;
   #token;
@@ -34,7 +34,7 @@ export class ApiService {
 
   verifyAuthetication(response) {
     if (response.status == 401 && this.isAuth) {
-      return window.location.href = '/auth/login'
+      return window.location.href = '/admin/login'
     }
   }
 

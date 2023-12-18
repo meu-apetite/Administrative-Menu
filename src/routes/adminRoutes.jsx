@@ -11,6 +11,9 @@ import Appearance from 'pages/Appearance/Index';
 import Home from 'pages/Home';
 import PaymentMethod from 'pages/PaymentMethod/Index';
 import Settings from 'pages/Settings/Index';
+import Login from '../pages/Auth/Login';
+import Register from '../pages/Auth/Register';
+
 
 const adminRoutes = [
   {
@@ -34,6 +37,10 @@ const adminRoutes = [
       { path: 'appearance', element: <Appearance /> },
       { path: 'payment-method', element: <PaymentMethod /> },
       { path: 'settings', element: <Settings /> },
+
+      { path: 'login', element: <Login /> },
+      { path: 'register', element: <Register /> },
+
     ],
   },
 ];

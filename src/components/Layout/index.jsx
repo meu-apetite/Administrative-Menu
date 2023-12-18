@@ -33,7 +33,7 @@ const Create = (props) => {
   }, []);
 
   if (authenticationStatus === 'pending') return <h1>Aguarde...</h1>;
-  if (authenticationStatus === 'disconnected') return <Navigate to="/auth/login" />;
+  if (authenticationStatus === 'disconnected') return <Navigate to="/admin/login" />;
   if (authenticationStatus === 'error') return <h1>Error no servidor...</h1>;
 
   if (authenticationStatus === 'logged') {
