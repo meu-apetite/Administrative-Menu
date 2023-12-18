@@ -89,7 +89,7 @@ export default function Login() {
       console.log(data.get('password'))
 
       const response = await apiService.post(
-        '/admin/login',
+        '/auth/login',
         { email: data.get('email'), password: data.get('password'), subscription: {} }
       );
 
