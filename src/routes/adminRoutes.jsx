@@ -17,11 +17,11 @@ import Register from '../pages/Auth/Register';
 
 const adminRoutes = [
   {
-    path: '/admin',
+    path: '/',
     element: <Layout />,
     exact: true,
     children: [
-      { path: '', element: <Home /> },
+      { path: 'home', element: <Home /> },
 
       { path: 'products', element: <Product /> },
       { path: 'products/create', element: <ProductCreate /> },
