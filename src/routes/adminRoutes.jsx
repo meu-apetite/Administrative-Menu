@@ -11,16 +11,14 @@ import Appearance from 'pages/Appearance/Index';
 import Home from 'pages/Home';
 import PaymentMethod from 'pages/PaymentMethod/Index';
 import Settings from 'pages/Settings/Index';
-import Login from '../pages/Auth/Login';
-import Register from '../pages/Auth/Register';
-
+import { Navigate } from 'react-router-dom';
 
 const adminRoutes = [
   {
     path: '/',
     element: <Layout />,
-    exact: true,
     children: [
+      { path: '', element: <Home /> },
       { path: 'home', element: <Home /> },
 
       { path: 'products', element: <Product /> },
@@ -37,10 +35,7 @@ const adminRoutes = [
       { path: 'appearance', element: <Appearance /> },
       { path: 'payment-method', element: <PaymentMethod /> },
       { path: 'settings', element: <Settings /> },
-
-      { path: 'login', element: <Login /> },
-      { path: 'register', element: <Register /> },
-
+      { path: '*', element: <Navigate to="/" /> },
     ],
   },
 ];

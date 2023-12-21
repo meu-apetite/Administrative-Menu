@@ -107,7 +107,7 @@ const Create = () => {
       await apiService.post('/admin/products', formData, true);
 
       toast.success('Produto cadastrado');
-      setTimeout(() => navigate({ pathname: '/admin/products' }), 700);
+      setTimeout(() => navigate({ pathname: '/products' }), 700);
     } catch (error) {
       toast.error(error.response.data?.message || 'Erro ao cadastrar produto');
     } finally {

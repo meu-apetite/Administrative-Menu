@@ -73,10 +73,10 @@ export default function Index() {
     }
   };
 
-  const toUpdate = (id) => navigate('/admin/products/update/' + id);
+  const toUpdate = (id) => navigate('/products/update/' + id);
 
   const toDuplicate = (product) => {
-    return navigate('/admin/products/create/', { state: { product, duplicate: true } });
+    return navigate('/products/create/', { state: { product, duplicate: true } });
   }
 
   useEffect(() => {

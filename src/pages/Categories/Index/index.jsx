@@ -171,7 +171,7 @@ const Index = () =>  {
                         <MoreVertIcon sx={{ fontSize: '20px', ml: -1 }} />
                       </IconButton>
                       <Menu {...bindMenu(popupState)}>
-                        <S.MenuItemCuston onClick={() => navigate('/admin/categories/update/' + item._id)}>
+                        <S.MenuItemCuston onClick={() => navigate('/categories/update/' + item._id)}>
                           <span className="fa fa-edit"></span> Editar
                         </S.MenuItemCuston>
                         <S.MenuItemCuston onClick={() => remove(item._id)}>

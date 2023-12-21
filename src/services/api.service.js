@@ -20,7 +20,7 @@ export class ApiService {
     const headers = {};
 
     if(this.isAuth) {
-      if(!this.token || !this._id) throw new Error('Dados de autentucação ausente!');
+      if(!this?.token || !this?._id) throw new Error('Dados de autentucação ausente!');
 
       headers['Authorization'] = `Bearer ${this.token.replace(/"/g, '')}`;
       headers['companyid'] = this._id.replace(/"/g, '');
@@ -33,8 +33,8 @@ export class ApiService {
 
 
   verifyAuthetication(response) {
-    if (response.status == 401 && this.isAuth) {
-      return window.location.href = '/admin/login'
+    if (response.status === 401 && this.isAuth) {
+      return window.location.href = '/login'
     }
   }
 

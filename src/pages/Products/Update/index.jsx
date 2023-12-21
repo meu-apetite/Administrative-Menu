@@ -100,7 +100,7 @@ const Update = () => {
       await apiService.put(`/admin/products/${id}`, formData, true);
 
       toast.success('Produto atualizado!');
-      setTimeout(() => {navigate({ pathname: '/admin/products' }); }, 2000);
+      setTimeout(() => {navigate({ pathname: '/products' }); }, 2000);
     } catch (e) {
       toast.error(e.response.data?.message || 'Erro ao atualizar produto');
     } finally {

@@ -77,7 +77,7 @@ const Register = () => {
         return toast.error('As senhas não correspondem');
       }
 
-      const response = await apiService.post('/auth/register', data);
+      const response = await apiService.post('/register', data);
 
       if (!response.data.success) {
         if (!response?.data?.message) return toastSuport();

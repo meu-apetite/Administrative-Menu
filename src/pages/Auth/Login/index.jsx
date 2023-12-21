@@ -104,9 +104,7 @@ export default function Login() {
       //     { icon: "⚠️" }
       //   );
       // }
-
-      navigate('/admin');
-      return document.location.reload();
+      return document.location.href = '/home';
     } catch (error) {
       alert(error)
       console.log(error);
