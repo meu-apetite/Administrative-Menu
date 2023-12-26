@@ -1,10 +1,8 @@
-import { useRoutes } from 'react-router-dom'
-import { AuthContext, AuthProvider } from 'contexts/auth'
-import authRoutes from 'routes/authRoutes'
-import adminRoutes from 'routes/adminRoutes'
-import theme from 'theme/default'
-import { ThemeProvider } from '@mui/material'
-import { useContext, useEffect } from 'react'
+import { useRoutes } from 'react-router-dom';
+import { AuthContext, AuthProvider } from 'contexts/auth';
+import authRoutes from 'routes/authRoutes';
+import adminRoutes from 'routes/adminRoutes';
+import { useContext, useEffect } from 'react';
 
 const GlobalStyles = () => (
   <style>
@@ -17,44 +15,44 @@ const GlobalStyles = () => (
       }
     `}
   </style>
-)
+);
 
 const Routes = () => {
-  const authContext = useContext(AuthContext)
-  const { authenticationStatus } = authContext
+  const authContext = useContext(AuthContext);
+  const { authenticationStatus } = authContext;
 
   const AuthRoutes = () => {
-    const routes = useRoutes([...authRoutes])
-    return <>{routes}</>
-  }
+    const routes = useRoutes([...authRoutes]);
+    return <>{routes}</>;
+  };
 
   const AdminRoutes = () => {
-    const routes = useRoutes([...adminRoutes])
-    return <>{routes}</>
-  }
+    const routes = useRoutes([...adminRoutes]);
+    return <>{routes}</>;
+  };
 
-  useEffect(() => {}, [])
+  useEffect(() => { }, []);
 
   return (
     <div>
       {authenticationStatus === null ? (
         <>Carregando</>
       ) : (
-        authenticationStatus === 'logged' ? <AdminRoutes /> : <AuthRoutes  />
+        authenticationStatus === 'logged' ? <AdminRoutes /> : <AuthRoutes />
       )}
     </div>
-  )
-}
+  );
+};
 
 const App = () => {
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <GlobalStyles />
       <AuthProvider>
         <Routes />
       </AuthProvider>
-    </ThemeProvider>
-  )
-}
+    </>
+  );
+};
 
-export default App
+export default App;

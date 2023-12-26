@@ -1,3 +1,4 @@
+import { Select } from '@mui/material';
 import { styled } from '@mui/system';
 
 export const ImageProduct = styled('img')({
@@ -54,4 +55,8 @@ export const WrapperUpload = styled('div')(({ theme }) => ({
     cursor: 'pointer'
   },
   marginBottom: -4
+}));
+
+export const SelectCustom = styled(Select)(({ theme }) => ({
+  width: '100%',
 }));

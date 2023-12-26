@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <link rel="icon" href="%PUBLIC_URL%/logo-meuapetite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Web site created using create-react-app" />
@@ -41,12 +41,14 @@
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
   <script>
-    navigator.serviceWorker.addEventListener('message', event => {
-      if (event.data.action === 'playAudio') {
-        const audio = new Audio('https://res.cloudinary.com/dd3cpbrv4/video/upload/v1699486782/yroksljyhhwzbehpvwus.mp3');
-        audio.play();
-      }
-    });
+    if (navigator?.serviceWorker) {
+      navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data.action === 'playAudio') {
+          const audio = new Audio('https://res.cloudinary.com/dd3cpbrv4/video/upload/v1699486782/yroksljyhhwzbehpvwus.mp3');
+          audio.play();
+        }
+      });
+    }
   </script>
 </body>
 

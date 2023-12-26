@@ -1,42 +1,51 @@
-import * as React from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
 import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { 
+  ListItemButton, 
+  ListItemIcon, 
+  ListItemText, 
+  ListItem, 
+  Divider, 
+  List, 
+  Toolbar, 
+  Box, 
+  IconButton,
+  Button
+} from '@mui/material';
 import menuItems from './items';
 import { Avatar, CardHeader, styled } from '@mui/material';
-import { red } from '@mui/material/colors';
-import { useContext } from 'react';
 import { AuthContext } from 'contexts/auth';
 import * as S from './style';
 
 const MiniDrawer = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const [open, setOpen] = React.useState(false);
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
+  const [open, setOpen] = useState(false);
+  const [routeActive, setRouteActive] = useState('home');
+  const { company, setIsMenuOpen, changeTheme, themeMode } = useContext(AuthContext);
 
-  const { company } = useContext(AuthContext);
+  const handleDrawerOpen = () => {
+    setOpen(true);
+    // button-float
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
 
   const toLink = (link) => {
     if (link === 'logout') {
       localStorage.removeItem('_id');
       localStorage.removeItem('token');
-      return window.location.reload();      
+      return window.location.reload();
     }
     if (window.innerWidth <= 768) handleDrawerClose();
+    setRouteActive(link)
     navigate(link);
   };
 
@@ -46,7 +55,9 @@ const MiniDrawer = () => {
 
   return (
     <Box
-      sx={{ display: 'flex', [theme.breakpoints.down('sm')]: { position: 'absolute' } }}
+      sx={{ 
+        display: 'flex', [theme.breakpoints.down('md')]: { position: 'absolute' } 
+      }}
     >
       <CssBaseline />
       <S.AppBar open={open} position="fixed" sx={{ height: "65px" }}>
@@ -64,7 +75,7 @@ const MiniDrawer = () => {
           <S.WrapperIntro>
             <CustomCardHeader
               sx={{ flexDirection: "row-reverse", gap: 1, pr: 0, m: 0 }}
-              avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">{company.fantasyName[0]}</Avatar>}
+              avatar={<Avatar src={company.custom.logo.url} />}
               title={company.fantasyName}
             />
           </S.WrapperIntro>
@@ -73,7 +84,14 @@ const MiniDrawer = () => {
 
       <S.Drawer variant="permanent" open={open}>
         <S.DrawerHeader>
-          <div className="on">online</div>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => changeTheme(themeMode === 'dark' ? 'light' : 'dark')}
+            startIcon={<i class="fa-solid fa-circle-half-stroke"></i>}
+          >
+            Modo {themeMode === 'dark' ? 'light' : 'dark'} 
+          </Button>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </IconButton>
@@ -82,9 +100,17 @@ const MiniDrawer = () => {
         {menuItems.map((group, menuIndex) => (
           <Box key={menuIndex}>
             <Divider key={menuIndex} />
-            <List>
+            <List sx={{ p: 0 }}>
               {group.map((item, index) => (
-                <ListItem key={index} disablePadding sx={{ display: 'block' }} onClick={() => toLink(item.link)}>
+                <ListItem 
+                  key={index} 
+                  disablePadding 
+                  sx={{ 
+                    display: 'block', 
+                    background: item.link === routeActive ? 'rgba(0, 0, 0, 0.04)' : '' 
+                  }} 
+                  onClick={() => toLink(item.link)}
+                >
                   <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5 }}>
                     <ListItemIcon title={item.text} sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
                       <item.Icon />

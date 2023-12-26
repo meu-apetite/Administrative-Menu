@@ -3,6 +3,7 @@ import { Box, Button, Grid, TextField } from '@mui/material';
 import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
 import * as S from './style';
+import ButtonFloat from 'components/ButtonFloat';
 
 const InfoAdmin = () => {
   const apiService = new ApiService();
@@ -76,9 +77,8 @@ const InfoAdmin = () => {
           />
         </Grid>
       </Grid>
-      <S.WrapperButtonSaved>
-        <Button variant='contained' onClick={save}>Salvar</Button>
-      </S.WrapperButtonSaved>
+
+      <ButtonFloat text="Salvar" onClick={save} />
     </Box>
   );
 };

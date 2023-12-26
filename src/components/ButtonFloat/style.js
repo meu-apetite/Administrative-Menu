@@ -4,10 +4,8 @@ import { styled } from '@mui/material/styles'
 export const ButtonCustom = styled(Button)(({ theme }) => ({
   position: 'fixed',
   bottom: 0,
-  left: '50%',  
+  left: 0,
   right: 0,
-  transform: 'translateX(-50%)',
-  textTransform: 'capitalize',
   width: '100%', 
   minHeight: '48px',
   zIndex: theme.zIndex.drawer + 1,
@@ -15,10 +13,13 @@ export const ButtonCustom = styled(Button)(({ theme }) => ({
   borderStartStartRadius: 8,
   borderEndStartRadius: 0,
   borderEndEndRadius: 0,
-  maxWidth: '400px', 
   '@media(min-width: 600px)': {
+    left: '50%',  
     bottom: '8px',
     borderEndStartRadius: 8,
     borderEndEndRadius: 8,
+    transform: 'translateX(-50%)',
+    textTransform: 'capitalize',
+    maxWidth: '400px', 
   },
 }))

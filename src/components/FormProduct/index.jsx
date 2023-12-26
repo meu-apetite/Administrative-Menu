@@ -60,7 +60,7 @@ const FormProduct = (props) => {
   useEffect(() => {
     getCategories();
     setData(props.initialData);
-    setImageCurrent(props.initialData.images)
+    setImageCurrent(props.initialData.images[0])
   }, []);
   
   useEffect(() => {
@@ -71,11 +71,11 @@ const FormProduct = (props) => {
     <Grid container spacing={2} sx={{ mt: '1rem' }}>
       <S.wrapperIntro>
         <S.WrapperUpload>
-          {(data.images.length >= 1) 
+          {(data.images?.length >= 1) 
             && <span className="fa fa-close close" onClick={removeImage}></span>
           }
           <label>
-            {(data.images.length <= 0) && <button>clique aqui para add imagem</button>}
+            {(!imageCurrent) && <button>clique aqui para add imagem</button>}
             <input accept="image/*" onChange={loadImage} type="file" />
             <S.ImageProduct src={imageCurrent || imageDefault} />
           </label>
@@ -149,6 +149,7 @@ const FormProduct = (props) => {
         />
       </Grid>
       <Grid item xs={12} sx={{ mt: 1.1, mb: 1.1 }}>
+        
         <Select
           value={data.category}
           data={categories}

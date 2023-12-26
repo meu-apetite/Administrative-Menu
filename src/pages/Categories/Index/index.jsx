@@ -8,17 +8,19 @@ import { AuthContext } from 'contexts/auth';
 import { ApiService } from 'services/api.service';
 import * as S from './style';
 import ButtonFloat from 'components/ButtonFloat';
+import BackdropLoading from 'components/BackdropLoading';
 
 const Index = () =>  {
   const label = { inputProps: { 'aria-label': 'Color switch demo' } };
 
   const navigate = useNavigate();
   const apiService = new ApiService();
-  const { setLoading, toast } = useContext(AuthContext);
+  const { toast } = useContext(AuthContext);
   const [categories, setCategories] = useState([]);
   const [categoryChanges, setCategoryChanges] = useState([]);
   const [productChangeCurrent, setProductChangeCurrent] = useState(-1);
-
+  const [loading, setLoading] = useState(false);
+  
   const getCategories = async () => {
     const response = await apiService.get('/admin/categoriesWithProducts');
     setCategories([]);
@@ -109,7 +111,7 @@ const Index = () =>  {
     addCategorychanges([index]);
   };
 
-  const openCreateProduct = (id) => navigate('/admin/products/create', { state: { categoryId: id } });
+  const openCreateProduct = (id) => navigate('/products/create', { state: { categoryId: id } });
 
   const save = async () => {
     try {
@@ -122,6 +124,7 @@ const Index = () =>  {
       const response = await apiService.put('/admin/categories', data);
 
       setCategories([]);
+      alert('ok')
       sortPosition(response.data);
       toast.success('Mudanças feitas com sucesso');
     } catch (error) {
@@ -131,7 +134,9 @@ const Index = () =>  {
     }
   };
 
-  const remove = async (id) => {
+  const remove = async (id, popupState) => {
+    popupState.close();
+
     try {
       setLoading('Atualizando');
       const response = await apiService.delete('/admin/categories/' + id);
@@ -171,10 +176,13 @@ const Index = () =>  {
                         <MoreVertIcon sx={{ fontSize: '20px', ml: -1 }} />
                       </IconButton>
                       <Menu {...bindMenu(popupState)}>
-                        <S.MenuItemCuston onClick={() => navigate('/categories/update/' + item._id)}>
+                        <S.MenuItemCuston onClick={() => {
+                          popupState.close();
+                          navigate('/categories/update/' + item._id)
+                        }}>
                           <span className="fa fa-edit"></span> Editar
                         </S.MenuItemCuston>
-                        <S.MenuItemCuston onClick={() => remove(item._id)}>
+                        <S.MenuItemCuston onClick={() => remove(item._id, popupState)}>
                           <span className="fa fa-remove"></span> Excluir
                         </S.MenuItemCuston>
                       </Menu>
@@ -249,7 +257,7 @@ const Index = () =>  {
         ))}
 
         {categories.length ? (
-          <Box sx={{ mb: '48px' }}>
+          <Box sx={{ mb: '48px' }} disabled={categoryChanges.length > 0 ? true : false}>
             <ButtonFloat text={'Salvar alterações'} onClick={save} />
           </Box>
         ) : null}
@@ -261,6 +269,8 @@ const Index = () =>  {
           categoria, clique em 'Nova Categoria'.
         </div>
       ) : null}
+
+      <BackdropLoading loading={loading} />
     </>
   );
 }

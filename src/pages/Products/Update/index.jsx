@@ -7,17 +7,19 @@ import Header from 'components/Header';
 import ComplementProduct from 'components/ComplementProduct';
 import FormProduct from 'components/FormProduct';
 import ButtonFloat from 'components/ButtonFloat';
+import BackdropLoading from 'components/BackdropLoading';
 
 const Update = () => {
   const apiService = new ApiService();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { setLoading, toast } = useContext(AuthContext);
+  const { toast } = useContext(AuthContext);
   const [tabCurrent, setTabCurrent] = useState(0);
   const [complements, setComplements] = useState([]);
   const [complementsErrors, setComplementsErrors] = useState([]);
   const [dataProduct, setDataProduct] = useState(null);
-
+  const [loading, setLoading] = useState(false);
+  
   const getProduct = async () => {
     try {
       setLoading('Buscando produto...');
@@ -37,42 +39,25 @@ const Update = () => {
     } catch (error) {
       toast.error('Erro ao buscar o produto');
     } finally {
-      setLoading(null);
+      setLoading(false);
     }
   };
 
   const validateData = () => {
-    let errors = 0;
+    const errors = [];
 
-    const dataForm = dataProduct;
-    setDataProduct({});
+    if (dataProduct.images.length <= 0) errors.push('Imagem é obrigatório');
+    if (!dataProduct.name.trim().length) errors.push('Nome é obrigatório');
+    if (isNaN(Number(dataProduct.price))) errors.push('Preço é obrigatório');
+    if (!isNaN(Number(dataProduct.price))) {
+      if (dataProduct.price <= 0) errors.push('Preço deve ser maior que zero');
+    } 
+    if (dataProduct.discountPrice && !dataProduct.discountPrice > 0) errors.push('Preço do desconto inválido');
+    if (!dataProduct.category) errors.push('Categoria é obrigatório');
+    if (errors.length <= 0) return true;
 
-    if (!dataProduct.name.trim().length) {
-      toast.error('O nome do produto não pode ficar vazio');
-      errors += 1;
-    }
-    if (isNaN(Number(dataProduct.price))) {
-      toast.error('Preço é obrigatório');
-      errors += 1;
-    } else {
-      Number(dataProduct.price) <= 0 
-        ? toast.error('Preço é deve ser maior que zero')
-        : dataForm.price = Number(dataProduct.price);
-    }
-    if (dataProduct.discountPriceFormat) {
-      dataForm.discountPrice = Number(dataProduct.discountPrice);
-    }
-    if (dataProduct.discountPrice && !dataProduct.discountPrice > 0) {
-      toast.error('Preço do desconto inválido');
-      errors += 1;
-    }
-    if (!dataProduct.category) {
-      toast.error('Selecione a categoria do produto');
-      errors += 1;
-    }
-
-    setDataProduct(dataForm);
-    return errors ? false : true;
+    toast.error(errors.map(error => `• ${error}.`).join('\n'));
+    return false;
   };
 
   const handleSubmit = async () => {
@@ -142,8 +127,9 @@ const Update = () => {
           </section>
         )}
       </Box>
-
       <ButtonFloat text="Salvar" onClick={() => handleSubmit()} />
+
+      <BackdropLoading loading={loading} />
     </section>
   );
 };

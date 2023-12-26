@@ -1,6 +1,5 @@
-import React, { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { Backdrop, Box, CircularProgress } from '@mui/material';
 import { ApiService } from 'services/api.service';
 
 export const AuthContext = createContext();
@@ -11,13 +10,14 @@ export const AuthProvider = (props) => {
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [authenticationStatus, setAuthenticationStatus] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [themeMode, setThemeMode] = useState('light') //dark;
 
   const getComapny = async () => {
     try {
       const response = await apiService.get(`/admin/company`);
       const company = await response.data;
       setCompany(company);
-      console.log(response)
       if (response.status === 401) {
         return setAuthenticationStatus('disconnected');
       }
@@ -27,23 +27,37 @@ export const AuthProvider = (props) => {
     }
   };
 
+  const changeTheme = (theme) => {
+    setThemeMode(theme);
+    localStorage.setItem('theme', theme);
+  };
+
+  const getTheme = (theme) => {
+    setThemeMode(localStorage.getItem('theme'));
+  };
+
   useEffect(() => {
-   getComapny();
-  }, [])
+    getComapny();
+    getTheme();
+  }, []);
 
   return (
-    <AuthContext.Provider 
-      value={{ company, setCompany, token, setToken, loading, setLoading, toast, authenticationStatus }}
+    <AuthContext.Provider
+      value={{
+        company,
+        setCompany,
+        token,
+        setToken,
+        loading,
+        setLoading,
+        toast,
+        authenticationStatus,
+        isMenuOpen,
+        setIsMenuOpen,
+        themeMode,
+        changeTheme
+      }}
     >
-      <Backdrop
-        sx={{ color: '#000000', zIndex: (theme) => theme.zIndex.drawer + 100 }}
-        open={loading}
-      >
-        <Box sx={{ display: 'grid', justifyContent: 'center', gap: 1 }}>
-          <CircularProgress size="4rem" sx={{ margin: 'auto' }} />
-          <strong style={{ color: '#fff' }}>{loading}</strong>
-        </Box>
-      </Backdrop>
       <Toaster position="top-center" reverseOrder={false} />
       {props.children}
     </AuthContext.Provider>

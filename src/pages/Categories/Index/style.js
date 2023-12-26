@@ -4,7 +4,7 @@ import { styled } from '@mui/system';
 export const ContainerCategories = styled('section')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: theme.spacing(3)
+  gap: theme.spacing(4)
 }));
 
 export const ContainerCategory = styled('div')(({ theme }) => ({
@@ -17,6 +17,7 @@ export const HeaderCategory = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   background: '#f1f3f1',
+  color: '#000000',
   padding: `${theme.spacing(0.5)} ${theme.spacing(2)}`,
   fontWeight: 'bold',
   'h2': {

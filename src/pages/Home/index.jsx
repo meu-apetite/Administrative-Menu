@@ -5,15 +5,28 @@ import CardContent from '@mui/material/CardContent';
 import QRCode from 'react-qr-code';
 import { Bar, } from 'react-chartjs-2';
 import { ApiService } from 'services/api.service';
-import { useEffect, useState } from 'react';
-import { Box, CardMedia, Typography } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
+import { Typography } from '@mui/material';
 import Chart from 'chart.js/auto';
 import * as S from './style';
+import { AuthContext } from 'contexts/auth';
 
 const StyledCard = styled(Card)({ maxWidth: '100%', marginBottom: '20px' });
 const ChartContainer = styled('div')({ width: '100%' });
 
-export default function Home() {
+const hexToRgba = (hex, alpha) => {
+  hex = hex.replace(/^#/, '');
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  const clampedAlpha = Math.min(1, Math.max(0, alpha));
+  const rgba = `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`;
+  return rgba;
+}
+
+const Home = () => {
+  const { company } = useContext(AuthContext);
   const apiService = new ApiService();
 
   const [barChartData, setBarChartData] = useState(null);
@@ -22,48 +35,51 @@ export default function Home() {
   const getOrders = async () => {
     try {
       const { data } = await apiService.get('/admin/orders-dashboard');
-
-      const ordersByDate = data.reduce((acc, order) => {
-        const dateWithoutTime = new Date(order.date).toLocaleDateString();
-        acc[dateWithoutTime] = (acc[dateWithoutTime] || 0) + order.products.length;
-        return acc;
-      }, {});
-      const dates = Object.keys(ordersByDate);
-      const quantities = Object.values(ordersByDate);
-
-      setBarChartData({
-        labels: dates,
-        datasets: [
-          {
-            label: 'Quantidade de Pedidos',
-            backgroundColor: 'rgba(75,192,192,0.4)',
-            borderColor: 'rgba(75,192,192,1)',
-            borderWidth: 1,
-            hoverBackgroundColor: 'rgba(75,192,192,0.6)',
-            hoverBorderColor: 'rgba(75,192,192,1)',
-            data: quantities,
-          },
-        ],
-      });
+      getDataOrders(data);
+      getDataProducts(data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const processOrderData = async (orders) => {
-    const response = await apiService.get('/admin/orders-all');
+  const getDataOrders = (data) => {
+    const ordersByDate = data.reduce((acc, order) => {
+      const dateWithoutTime = new Date(order.date).toLocaleDateString();
+      acc[dateWithoutTime] = (acc[dateWithoutTime] || 0) + order.products.length;
+      return acc;
+    }, {});
+    const dates = Object.keys(ordersByDate);
+    const quantities = Object.values(ordersByDate);
+
+    setBarChartData({
+      labels: dates,
+      datasets: [
+        {
+          label: 'Quantidade de Pedidos',
+          backgroundColor: hexToRgba(company.custom.colorSecondary, 0.6) || 'rgba(75,192,192,0.4)',
+          borderColor: hexToRgba(company.custom.colorSecondary, 1) ||'rgba(75,192,192,1)',
+          borderWidth: 1,
+          hoverBackgroundColor: 'rgba(75,192,192,0.6)',
+          hoverBorderColor: 'rgba(75,192,192,1)',
+          data: quantities,
+        },
+      ],
+    });
+  };
+
+  const getDataProducts = (orders) => {
     const productCount = {};
-  
-    const productNames = response.data.reduce((acc, order) => {
+
+    const productNames = orders.reduce((acc, order) => {
       order.products.forEach((product) => {
         const productId = product.productId;
-        const productName = product.productName; 
+        const productName = product.productName;
         acc[productId] = productName;
       });
       return acc;
     }, {});
-  
-    response.data.forEach((order) => {
+
+    orders.forEach((order) => {
       order.products.forEach((product) => {
         const productId = product.productId;
         const productName = productNames[productId];
@@ -74,50 +90,49 @@ export default function Home() {
         }
       });
     });
-  
+
     const labels = Object.keys(productCount);
     const data = Object.values(productCount);
-  
+
     setDoughnutChartData({
       labels,
       datasets: [{
         label: 'Quantidade Vendida',
-        backgroundColor: 'rgba(75,192,192,0.2)',
-        borderColor: 'rgba(75,192,192,1)',
+        backgroundColor: hexToRgba(company.custom.colorSecondary, 0.6) || 'rgba(75,192,192,0.2)',
+        borderColor: hexToRgba(company.custom.colorSecondary, 1) || 'rgba(75,192,192,1)',
         borderWidth: 1,
-        hoverBackgroundColor: 'rgba(75,192,192,0.4)',
-        hoverBorderColor: 'rgba(75,192,192,1)',
+        hoverBackgroundColor: hexToRgba(company.custom.colorSecondary, 0.4) || 'rgba(75,192,192,0.4)',
+        hoverBorderColor: hexToRgba(company.custom.colorSecondary, 1) || 'rgba(75,192,192,1)',
         data,
       }],
     });
   };
-  
+
 
   useEffect(() => {
     getOrders();
-    processOrderData()
   }, []);
 
   return (
     <div>
       <S.CardWelcome>
-          <CardContent sx={{ flex: '1 0 auto', p: 0 }}>
-            <Typography component="div" variant="h5">Bem-vindo(a)!</Typography>
-            <Typography variant="subtitle1" color="text.secondary" component="div">
-              Este é o seu painel administrativo. Aqui, você pode adicionar e excluir
-              produtos, gerenciar categorias e ajustar as configurações e aparência
-              do seu cardápio. Aponte sua camêra para o qr para visitar seu cardapio.
-            </Typography>
-          </CardContent>
-          <>
-            <QRCode value={'http://192.168.0.136/cardapio/doces'} />
-          </>
+        <CardContent sx={{ flex: '1 0 auto', p: 0 }}>
+          <Typography component="div" variant="h5">Bem-vindo(a)!</Typography>
+          <Typography variant="subtitle1" color="text.secondary" component="div">
+            Este é o seu painel administrativo. Aqui, você pode adicionar e excluir
+            produtos, gerenciar categorias e ajustar as configurações e aparência
+            do seu cardápio. Aponte sua camêra para o qr para visitar seu cardapio.
+          </Typography>
+        </CardContent>
+        <>
+          <QRCode value={'https://meuapetite.com/' + company.storeUrl} />
+        </>
       </S.CardWelcome>
 
       <Typography variant="h6">Ultímos 30 dias</Typography>
       <S.SectionChart>
         <StyledCard>
-        <CardHeader title={<Typography variant="h6">Pedidos</Typography>} />
+          <CardHeader title={<Typography variant="h6">Pedidos</Typography>} />
           <CardContent>
             <ChartContainer sx={{ width: '100%' }}>
               {
@@ -136,7 +151,7 @@ export default function Home() {
           <CardHeader title={<Typography variant="h6">Mais vendidos</Typography>} />
           <CardContent>
             <ChartContainer sx={{ width: '100%' }}>
-              { (doughnutChartData !== null) && 
+              {(doughnutChartData !== null) &&
                 <Bar data={doughnutChartData} options={{ indexAxis: 'y' }} />
               }
             </ChartContainer>
@@ -146,3 +161,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default Home;

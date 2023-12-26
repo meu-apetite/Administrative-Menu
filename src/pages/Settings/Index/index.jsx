@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
 import Header from 'components/Header';
-import HorarioFuncionamento from '../HorarioFuncionamento';
+import OpeningHours from '../OpeningHours';
 import Delivery from '../Delivery';
 import InfoAdmin from '../InfoAdmin';
 import InfoContact from '../InfoContact';
@@ -9,11 +9,9 @@ import * as S from './style';
 import { AuthContext } from 'contexts/auth';
 
 const Settings = () => {
-  const [tabValue, setTabValue] = useState('delivery');
-  const { toast, setLoading, company, setCompany } = useContext(AuthContext);
-
+  const [tabValue, setTabValue] = useState('orderTime');
+  const { company } = useContext(AuthContext);
   const [width, setWidth] = useState(0);
-
   const handleResize = () => setWidth(window.innerWidth);
 
   useEffect(() => {
@@ -23,7 +21,7 @@ const Settings = () => {
 
   return (
     (width > 0) && (
-      <section>
+      <S.Container>
         <Header title="Configurações" back={-1} />
 
         <S.WrapperTabs>
@@ -46,12 +44,15 @@ const Settings = () => {
         </S.WrapperTabs>
 
         {tabValue === 'orderTime' && (
-          <HorarioFuncionamento openingHours={company?.settings.openingHours} />
+          <OpeningHours 
+            openingHours={company?.settings.openingHours} 
+            setTabValue={setTabValue} 
+          />
         )}
-        {tabValue === 'delivery' && <Delivery />}
-        {tabValue === 'contact' && <InfoContact />}
-        {tabValue === 'admin' && <InfoAdmin />}
-      </section>
+        {tabValue === 'delivery' && <Delivery setTabValue={(v) => setTabValue(v)} />}
+        {tabValue === 'contact' && <InfoContact setTabValue={(v) => setTabValue(v)} />}
+        {tabValue === 'admin' && <InfoAdmin setTabValue={(v) => setTabValue(v)} />}
+      </S.Container>
     )
   );
 };

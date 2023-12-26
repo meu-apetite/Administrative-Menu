@@ -7,14 +7,16 @@ import Header from 'components/Header';
 import ComplementProduct from 'components/ComplementProduct';
 import ButtonFloat from 'components/ButtonFloat';
 import FormProduct from 'components/FormProduct';
+import BackdropLoading from 'components/BackdropLoading';
 
 const Create = () => {
   const apiService = new ApiService();
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { setLoading, toast } = useContext(AuthContext);
+  const { toast } = useContext(AuthContext);
   const [tabCurrent, setTabCurrent] = useState(0);
   const [dataInit, setDataInit] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     name: '',
     description: '',
@@ -42,36 +44,20 @@ const Create = () => {
   };
 
   const validateData = () => {
-    let errors = 0;
-    const dataForm = data;
-    setData({});
+    const errors = [];
 
-    if (!data.name.trim().length) {
-      toast.error('O nome do produto não pode ficar vazio');
-      errors += 1;
-    }
-    if (isNaN(Number(data.price))) {
-      toast.error('Preço é obrigatório');
-      errors += 1;
-    } else {
-      Number(data.price) <= 0 
-        ? toast.error('Preço é deve ser maior que zero')
-        : dataForm.price = Number(data.price);
-    }
-    if (data.discountPriceFormat) {
-      dataForm.discountPrice = Number(data.discountPrice);
-    }
-    if (data.discountPrice && !data.discountPrice > 0) {
-      toast.error('Preço do desconto inválido');
-      errors += 1;
-    }
-    if (!data.category) {
-      toast.error('Selecione a categoria do produto');
-      errors += 1;
-    }
+    if (data.images.length <= 0) errors.push('Imagem é obrigatório');
+    if (!data.name.trim().length) errors.push('Nome é obrigatório');
+    if (isNaN(Number(data.price))) errors.push('Preço é obrigatório');
+    if (!isNaN(Number(data.price))) {
+      if (data.price <= 0) errors.push('Preço deve ser maior que zero');
+    } 
+    if (data.discountPrice && !data.discountPrice > 0) errors.push('Preço do desconto inválido');
+    if (!data.category) errors.push('Categoria é obrigatório');
+    if (errors.length <= 0) return true;
 
-    setData(dataForm);
-    return errors ? false : true;
+    toast.error(errors.map(error => `• ${error}.`).join('\n'));
+    return false;
   };
 
   const handleSubmit = async () => {
@@ -87,8 +73,6 @@ const Create = () => {
         return toast.error(complementInsertIds.message);
       }
     }
-
-    console.log(complementInsertIds)
 
     try {
       const formData = new FormData();
@@ -163,8 +147,9 @@ const Create = () => {
           </section>
         )}
       </Box>
-
       <ButtonFloat text="Salvar" onClick={() => handleSubmit()} />
+
+      <BackdropLoading loading={loading} />
     </Box>
   );
 };

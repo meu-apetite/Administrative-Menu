@@ -40,7 +40,6 @@ export const ModalContent = styled('div')({
 });
 
 export const CardCustom = styled(Card)({
-  backgroundColor: ' #ffffff',
   boxShadow: '-1px 1px 1px rgba(0, 0, 0, 0.09)',
 });
 

@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
-import { Grid, Typography, TextField, Button } from '@mui/material';
+import { Grid, Typography, TextField } from '@mui/material';
 import { AuthContext } from 'contexts/auth/index.jsx';
 import { ApiService } from 'services/api.service';
-import * as S from './style.js';
+import ButtonFloat from 'components/ButtonFloat/index.jsx';
 
-const HorarioFuncionamento = ({ openingHours, }) => {
+const OpeningHours = ({ openingHours, }) => {
   const apiService = new ApiService();
 
   const { toast, setLoading, company, setCompany } = useContext(AuthContext);
@@ -42,7 +42,6 @@ const HorarioFuncionamento = ({ openingHours, }) => {
     }
   };
 
-
   useEffect(() => {
     setHours(openingHours);
   }, [openingHours]);
@@ -77,11 +76,9 @@ const HorarioFuncionamento = ({ openingHours, }) => {
         })}
       </Grid>
 
-      <S.WrapperButtonSaved>
-        <Button variant='contained' onClick={save}>Salvar</Button>
-      </S.WrapperButtonSaved>
+      <ButtonFloat text="Salvar" onClick={save} />
     </section>
   );
 };
 
-export default HorarioFuncionamento;
+export default OpeningHours;

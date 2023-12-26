@@ -22,7 +22,7 @@ export const closedMixin = (theme) => ({
   [theme.breakpoints.up('sm')]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
-  '@media (max-width: 768px)': {
+  '@media (max-width: 900px)': {
     display: 'none'
   },
 })
@@ -35,11 +35,11 @@ export const DrawerHeader = styled('div')(({ theme }) => ({
   paddingLeft: '1.25rem',
   ...theme.mixins.toolbar,
   '.on': {
-    color: '#198754', 
     display: 'flex',
-    border: '1px solid #198754', 
+    border: '2px solid #000000', 
     borderRadius: 4,
-    padding: '2px 12px' 
+    padding: '2px 12px',
+    cursor: 'pointer'
   }
 }))
 
@@ -47,14 +47,14 @@ export const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
   zIndex: 2,
-  '@media (min-width: 768px)': { zIndex: theme.zIndex.drawer + 1 },    
+  '@media (min-width: 900px)': { zIndex: theme.zIndex.drawer + 1 },    
   transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     marginLeft: 240,
-    '@media (min-width: 768px)': { width: `calc(100% - ${240}px)` },    
+    '@media (min-width: 900px)': { width: `calc(100% - ${240}px)` },    
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -66,6 +66,7 @@ export const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
   width: 240,
+  paddingTop: 0,
   flexShrink: 0,
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',

@@ -3,8 +3,9 @@ import { Button, FormControl, Grid, InputLabel, MenuItem, TextField } from '@mui
 import { AuthContext } from 'contexts/auth';
 import { ApiService } from 'services/api.service';
 import * as S from './style';
+import ButtonFloat from 'components/ButtonFloat';
 
-const Delivery = () => {
+const Delivery = (props) => {
   const apiService = new ApiService();
   const { setLoading, toast, company, setCompany } = useContext(AuthContext);
 
@@ -163,9 +164,7 @@ const Delivery = () => {
         ) : null}
       </S.Wrapper>
 
-      <S.WrapperButtonSaved>
-        <Button variant='contained' onClick={update}>Salvar</Button>
-      </S.WrapperButtonSaved>
+      <ButtonFloat text="Salvar" onClick={update} />
     </section>
   );
 };

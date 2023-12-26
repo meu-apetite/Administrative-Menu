@@ -1,69 +1,56 @@
-import React, { useState, useContext } from 'react';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
+import { Box, Grid, TextField, } from '@mui/material';
 import Header from 'components/Header';
 import { AuthContext } from 'contexts/auth';
 import { ApiService } from 'services/api.service';
+import ButtonFloat from 'components/ButtonFloat';
 
 const Create = () => {
   const apiService = new ApiService();
 
   const navigate = useNavigate();
-  const [data, setData] = useState({ title: '' });
-  const [buttonDisabled, setButtonDisabled] = useState(false);
   const {setLoading, toast } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
     try {
-      if (!data.title.trim().length ) return toast('Preencha o campo "Nome"', { icon: 'ℹ️' });
+      e.preventDefault();
+
+      const form = new FormData(e.target);
+      console.log(form)
+
+      if (!form.get('title').trim().length) {
+        return toast('Preencha o campo "Nome"', { icon: 'ℹ️' });
+      }
+
       setLoading('Criando categoria...');
       
-      const response = await apiService.post('/admin/categories', data);
-      const category = response.data;
-
-      setButtonDisabled(true);
+      await apiService.post('/admin/categories', { title: form.get('title') });
 
       toast.success('Categoria criada!');
-
       setTimeout(() => {
-        navigate({ pathname: '/admin/categories', search: category._id });
+        navigate('/categories');
         setLoading(false);
-      }, 2000);
+      }, 1000);
     } catch (e) {
-      toast.error('Erro ao criar a categoria');
+      console.log(e)
       setLoading(false);
+      toast.error('Erro ao criar a categoria');
     }
   };
 
   return (
-    <>
-      <Header
-        title="Nova categoria"
-        back={-1}
-        buttonText="Salvar"
-        buttonClick={handleSubmit}
-        buttonDisabled={buttonDisabled}
-      />
-
+    <form onSubmit={handleSubmit}>
+      <Header title="Nova categoria" back={-1} />
       <Box component="section" noValidate>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12}>
-            <TextField
-              onBlur={(e) => setData({ ...data, title: e.target.value })}
-              margin="dense"
-              required
-              fullWidth
-              label="Título"
-              autoFocus
-            />
+            <TextField required fullWidth label="Título" name="title" />
           </Grid>
         </Grid>
       </Box>
-    </>
+      <ButtonFloat type="submit" text="Salvar" />
+    </form>
   );
 };
 

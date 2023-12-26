@@ -1,11 +1,9 @@
-import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useState } from 'react';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
   Avatar,
   Button,
   CssBaseline,
-  createTheme,
   ThemeProvider,
   TextField,
   FormControlLabel,
@@ -16,25 +14,18 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-import ImageIntro from 'assets/images/16548-min.jpg';
+import ImageIntro from 'assets/images/intro-login.webp';
 import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
-
-const apiService = new ApiService(false);
-
-const themeDark = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: { main: '#1bac4b' },
-    secondary: { main: '#1bac4b' },
-    contrastThreshold: 3,
-    tonalOffset: 0.2,
-  },
-});
+import * as S from './style';
+import BackdropLoading from 'components/BackdropLoading';
 
 export default function Login() {
-  const { setLoading, toast } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const apiService = new ApiService(false);
+  const { toast } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({ email: '', password: '' });
+
 
   const checkSuport = () => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
@@ -67,7 +58,7 @@ export default function Login() {
     const permission = await window.Notification.requestPermission();
 
     if (permission !== 'granted') {
-      return toast.error(
+      toast.error(
         'Por favor, conceda permissão de notificação para o funcionamento adequado do sistema.',
       );
     }
@@ -75,64 +66,50 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     try {
-      setLoading(true);
-      
+      setLoading('Aguarde...');
       e.preventDefault();
-      // const notificationSuport = checkSuport();
-      // await requestNotificationPermission();
-      // const subscription = await registerServiceWorker() || null;
+      let subscription = null
 
-      const data = new FormData(e.target);
-      
-      if (!data.get('email')) return toast.error('O Email não pode ficar em branco');
-      if (!data.get('password')) return toast.error('A Senha não pode ficar em branco');
-      console.log(data.get('password'))
+      if (!data.email) return toast.error('O Email não pode ficar em branco');
+      if (!data.password) return toast.error('A Senha não pode ficar em branco');
 
-      const response = await apiService.post(
-        '/auth/login',
-        { email: data.get('email'), password: data.get('password'), subscription: {} }
-      );
+      if (checkSuport()) {
+        await requestNotificationPermission();
+        subscription = await registerServiceWorker() || null;
+      }
+
+      const response = await apiService.post('/auth/login', { ...data, subscription });
 
       if (!response.data.success) return toast.error(response.data.message);
 
       localStorage.setItem('_id', JSON.stringify(response.data._id));
       localStorage.setItem('token', JSON.stringify(response.data.token));
 
-      // if (!notificationSuport) {
-      //   toast(
-      //     'Seu navegador não suporta notificações em tempo real. Use o Google Chrome para acessar todas as funcionalidades do sistema.',
-      //     { icon: "⚠️" }
-      //   );
-      // }
-      return document.location.href = '/home';
+      if (!checkSuport()) {
+        toast(
+          'Seu navegador não suporta notificações em tempo real.'
+          + 'Use o Google Chrome para acessar todas as funcionalidades do sistema.',
+          { icon: "⚠️" }
+        );
+
+        setTimeout(() => document.location.href = '/home', 5000)
+      } else {
+        return document.location.href = '/home';
+      }      
     } catch (error) {
-      alert(error)
-      console.log(error);
       return toast.error(error.response.data.message);
     } finally {
       setLoading(false);
-      setTimeout(() => setLoading(false), 4000);
     }
   };
 
   return (
-    <ThemeProvider theme={themeDark}>
+    <ThemeProvider theme={S.ThemeDark}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
 
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            backgroundImage: `url(${ImageIntro})`,
-            backgroundRepeat: 'no-repeat',
-            backgroundColor: (t) => t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+        <S.GridCustom
+          item xs={false} sm={4} md={7} sx={{ backgroundImage: `url(${ImageIntro})` }} />
 
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
           <Box sx={{ my: 8, mx: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -141,14 +118,23 @@ export default function Login() {
             <Typography component="h1" variant="h5">Login</Typography>
 
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
-              <TextField margin="normal" required fullWidth
-                name="email" label="Email" autoComplete="email"
-                autoFocus
+              <TextField
+                margin="normal"
+                fullWidth
+                label="Email"
+                autoComplete="email"
+                onChange={e => setData({ ...data, email: e.target.value })}
+                value={data.email}
               />
 
-              <TextField margin="normal" required fullWidth
-                label="Senha" type="password" name="password"
+              <TextField
+                margin="normal"
+                fullWidth
+                label="Senha"
+                type="password"
                 autoComplete="current-password"
+                onChange={e => setData({ ...data, password: e.target.value })}
+                value={data.password}
               />
 
               <FormControlLabel
@@ -173,12 +159,14 @@ export default function Login() {
 
               <Typography variant="body2" color="text.secondary" align="center">
                 {'Copyright © '}
-                <Link color="inherit" href="https://lojaexpressa.com/">Loja Expressa</Link>
+                <Link color="inherit" href="https://meuapetite.com/">Meu apetite</Link>
                 {' '} {new Date().getFullYear()}
               </Typography>
             </Box>
           </Box>
         </Grid>
+
+        <BackdropLoading loading={loading} />
       </Grid>
     </ThemeProvider>
   );
