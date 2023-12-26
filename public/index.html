@@ -41,7 +41,7 @@
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
   <script>
-    if (navigator?.serviceWorker) {
+    if (navigator?.serviceWorker) { 
       navigator.serviceWorker.addEventListener('message', event => {
         if (event.data.action === 'playAudio') {
           const audio = new Audio('https://res.cloudinary.com/dd3cpbrv4/video/upload/v1699486782/yroksljyhhwzbehpvwus.mp3');
