@@ -6,7 +6,7 @@ import QRCode from 'react-qr-code';
 import { Bar, } from 'react-chartjs-2';
 import { ApiService } from 'services/api.service';
 import { useContext, useEffect, useState } from 'react';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Chart from 'chart.js/auto';
 import * as S from './style';
 import { AuthContext } from 'contexts/auth';
@@ -124,9 +124,9 @@ const Home = () => {
             do seu cardápio. Aponte sua camêra para o qr para visitar seu cardapio.
           </Typography>
         </CardContent>
-        <>
+        <Box sx={{ border: ' 2px solid #fff', width: 'fit-content', m: 'auto' }}>
           <QRCode value={'https://meuapetite.com/' + company.storeUrl} />
-        </>
+        </Box>
       </S.CardWelcome>
 
       <Typography variant="h6">Ultímos 30 dias</Typography>

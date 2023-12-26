@@ -46,8 +46,8 @@ const Create = () => {
   const validateData = () => {
     const errors = [];
 
-    if (data.images.length <= 0) errors.push('Imagem é obrigatório');
-    if (!data.name.trim().length) errors.push('Nome é obrigatório');
+    if (data.images?.length <= 0) errors.push('Imagem é obrigatório');
+    if (!data.name?.trim().length) errors.push('Nome é obrigatório');
     if (isNaN(Number(data.price))) errors.push('Preço é obrigatório');
     if (!isNaN(Number(data.price))) {
       if (data.price <= 0) errors.push('Preço deve ser maior que zero');
@@ -114,7 +114,6 @@ const Create = () => {
         unit: state.product.unit,
         images: []
       });
-      console.log(state.product)
       setComplements(state.product.complements);
     }
   }, []);

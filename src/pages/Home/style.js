@@ -14,10 +14,11 @@ export const CardWelcome = styled('div')(({ theme }) => ({
   marginBottom: '32px',
   gridTemplateColumns: '1fr',
   justifyContent: 'center',
+  gap: '16px',
   '@media(min-width: 576px)': {
-    gridTemplateColumns: '10fr 2fr',
+    gridTemplateColumns: '8fr 3fr',
     'svg': {
-      width: '104px',
+      width: '100%',
       margin: 'auto'
     }
   },
