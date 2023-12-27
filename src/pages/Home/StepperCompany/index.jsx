@@ -84,7 +84,7 @@ const StepperCompany = () => {
     const handleGoToAddress = () => navigate('/address');
 
     return (
-      (!company.address.zipCode) ? (
+      (!company?.address?.zipCode) ? (
         <div>
           <Typography variant="h6">Atualizar endereço</Typography>
           <Typography variant="p">
@@ -129,10 +129,10 @@ const StepperCompany = () => {
       <h3>Siga os passos abaixo para ativar e disponibilizar o seu cardápio online.</h3>
 
       <Stepper sx={{ mb: 2 }} activeStep={activeStep} alternativeLabel>
-        <Step key={0} completed={company.verifyEmail}>
+        <Step key={0} completed={company?.verifyEmail}>
           <StepLabel></StepLabel>
         </Step>
-        <Step key={1} completed={company.address?.zipCode}>
+        <Step key={1} completed={company?.address?.zipCode}>
           <StepLabel></StepLabel>
         </Step>
         <Step key={2} completed={company.custom.logo?.url?.length > 0}>
