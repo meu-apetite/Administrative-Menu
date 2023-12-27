@@ -1,13 +1,15 @@
 import { useState, useEffect, useContext } from 'react';
-import { Button, FormControl, Grid, InputLabel, MenuItem, TextField } from '@mui/material';
+import { FormControl, Grid, InputLabel, MenuItem, TextField } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
 import { ApiService } from 'services/api.service';
 import * as S from './style';
 import ButtonFloat from 'components/ButtonFloat';
+import BackdropLoading from 'components/BackdropLoading';
 
 const Delivery = (props) => {
   const apiService = new ApiService();
-  const { setLoading, toast, company, setCompany } = useContext(AuthContext);
+  const { toast, company, setCompany } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState({
     allowStorePickup: true,
@@ -38,7 +40,7 @@ const Delivery = (props) => {
 
   const update = async () => {
     try {
-      setLoading(true);
+      setLoading('Atualizando...');
       const form = { ...data };
 
       if (dataFormat.fixedValue ) {
@@ -165,6 +167,8 @@ const Delivery = (props) => {
       </S.Wrapper>
 
       <ButtonFloat text="Salvar" onClick={update} />
+
+      <BackdropLoading loading={loading} />
     </section>
   );
 };

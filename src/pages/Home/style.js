@@ -1,3 +1,4 @@
+import { Card } from '@mui/material';
 import { styled } from '@mui/system';
 
 export const SectionChart = styled('section')(({ theme }) => ({
@@ -29,3 +30,7 @@ export const CardWelcome = styled('div')(({ theme }) => ({
     margin: 'auto'
   }
 }));
+
+export const StyledCard = styled(Card)({ maxWidth: '100%', marginBottom: '20px' });
+
+export const ChartContainer = styled('div')({ width: '100%' });

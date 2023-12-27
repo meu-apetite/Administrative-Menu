@@ -1,10 +1,13 @@
 import { styled } from '@mui/system';
-import { Button } from '@mui/material';
+import { createTheme } from '@mui/material';
 
-export const Header = styled('header')({
-  position: 'relative',
-  border: '1px solid #dcdcdc',
-  display: 'flex',
-  justifyContent: 'center',
-  padding: '0.6rem 0'
+
+export const ThemeDark = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: { main: '#ee2737ff' },
+    secondary: { main: '#ff7f32ff' },
+    contrastThreshold: 3,
+    tonalOffset: 0.2,
+  },
 });

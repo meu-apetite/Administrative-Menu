@@ -3,20 +3,24 @@ import { Box, Button, Grid, TextField } from '@mui/material';
 import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
 import ButtonFloat from 'components/ButtonFloat';
+import BackdropLoading from 'components/BackdropLoading';
 
 const InfoContact = () => {
   const apiService = new ApiService();
-  const { toast, setLoading, company, setCompany } = useContext(AuthContext);
-  const [data, setData] = useState({ name: '', phoneNumber: '', email: '' });
+  const { toast, company, setCompany } = useContext(AuthContext);
+  const [data, setData] = useState({ phoneNumber: '', email: '' });
+  const [loading, setLoading] = useState(false);
 
   const save = async (e) => {
     e.preventDefault();
     setLoading('Agurade...');
 
     try {
-      const response = await apiService.put('/admin/company/owner', data);
+      const response = await apiService.put('/admin/company/contact', data);
       setData(response.data);
-      setCompany({ ...company, owner: response.data })
+      setCompany({ 
+        ...company, whastapp: response.data.whastapp, email: response.data.email 
+      });
     } catch (error) {
       console.log(error);
     } finally {
@@ -26,7 +30,7 @@ const InfoContact = () => {
 
   const getData = async (id) => {
     try {
-      setData(company.owner);
+      setData({ email: company.email, whatsapp: company.whatsapp });
     } catch (error) {
       toast.error('Não foi possível recuperar os dados');
     };
@@ -42,7 +46,7 @@ const InfoContact = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={12}>
           <TextField
-            label="Email oficial (loja)"
+            label="Email oficial"
             value={data?.email}
             type="email"
             onChange={(e) => setData({ ...data, email: e.target.value })}
@@ -54,11 +58,11 @@ const InfoContact = () => {
         </Grid>
         <Grid item xs={12} sm={12}>
           <TextField
-            label="Whatsapp oficial (loja)"
-            value={data?.phoneNumber}
+            label="Whatsapp oficial"
+            value={data?.whatsapp}
             type="phone"
-            onChange={(e) => setData({ ...data, phoneNumber: e.target.value })}
-            InputLabelProps={{ shrink: data.phoneNumber }}
+            onChange={(e) => setData({ ...data, whatsapp: e.target.value })}
+            InputLabelProps={{ shrink: data.whatsapp }}
             margin="dense"
             fullWidth
             required
@@ -67,6 +71,8 @@ const InfoContact = () => {
       </Grid>
 
       <ButtonFloat text="Salvar" onClick={save} />
+
+      <BackdropLoading loading={loading} />
     </Box>
   );
 };

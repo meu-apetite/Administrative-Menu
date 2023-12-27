@@ -3,11 +3,12 @@ import { Grid, Typography, TextField } from '@mui/material';
 import { AuthContext } from 'contexts/auth/index.jsx';
 import { ApiService } from 'services/api.service';
 import ButtonFloat from 'components/ButtonFloat/index.jsx';
+import BackdropLoading from 'components/BackdropLoading';
 
 const OpeningHours = ({ openingHours, }) => {
   const apiService = new ApiService();
 
-  const { toast, setLoading, company, setCompany } = useContext(AuthContext);
+  const { toast, company, setCompany } = useContext(AuthContext);
 
   const listDayName = [
     { name: 'monday', label: 'Segunda' },
@@ -20,6 +21,7 @@ const OpeningHours = ({ openingHours, }) => {
   ];
 
   const [hours, setHours] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const changeHours = (day, interval, value) => {
     const newHours = { ...hours };
@@ -77,6 +79,8 @@ const OpeningHours = ({ openingHours, }) => {
       </Grid>
 
       <ButtonFloat text="Salvar" onClick={save} />
+
+      <BackdropLoading loading={loading} />
     </section>
   );
 };

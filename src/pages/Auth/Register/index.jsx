@@ -7,7 +7,6 @@ import {
   Link,
   Grid,
   Box,
-  OutlinedInput,
   InputAdornment,
   CssBaseline,
   Checkbox,
@@ -16,32 +15,26 @@ import {
   Container,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
-
-const themeDark = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: { main: '#1bac4b' },
-    secondary: { main: '#1bac4b' },
-    contrastThreshold: 3,
-    tonalOffset: 0.2,
-  },
-});
+import * as S from './style';
+import BackdropLoading from 'components/BackdropLoading';
 
 const Register = () => {
   const apiService = new ApiService(false);
   const navigate = useNavigate();
-  const { setLoading, toast } = useContext(AuthContext);
+  const { toast } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
-    email: null,
-    password: null,
-    passwordRepeat: null,
-    storeUrl: null,
-    fantasyName: null,
-    ownerName: null,
-    description: null
+    email: '',
+    password: '',
+    passwordRepeat: '',
+    storeUrl: '',
+    fantasyName: '',
+    ownerName: '',
+    description: '',
+    whatsapp: ''
   });
 
   const toastSuport = () => {
@@ -57,18 +50,16 @@ const Register = () => {
           <span> Chamar suporte</span>
         </Button>
       </div>,
-      { duration: 20000 },
+      { duration: 5000 },
     );
   };
 
   const handleSubmit = async (e) => {
     try {
-      setLoading(true);
-      e.preventDefault();
-
       if (
         !data.email || !data.password || !data.passwordRepeat ||
-        !data.fantasyName || !data.ownerName || !data.storeUrl
+        !data.fantasyName || !data.ownerName || !data.storeUrl || 
+        !data.whatsapp
       ) {
         return toast.error('Todos os campos precisam serem preencidos!');
       }
@@ -77,7 +68,9 @@ const Register = () => {
         return toast.error('As senhas não correspondem');
       }
 
-      const response = await apiService.post('/register', data);
+      setLoading('Fazendo cadastro...')
+
+      const response = await apiService.post('/auth/register', data);
 
       if (!response.data.success) {
         if (!response?.data?.message) return toastSuport();
@@ -92,12 +85,12 @@ const Register = () => {
       }
       return toastSuport();
     } finally {
-      setTimeout(() => setLoading(false), 2000);
+      setTimeout(() => setLoading(false));
     }
   };
 
   return (
-    <ThemeProvider theme={themeDark}>
+    <ThemeProvider theme={S.ThemeDark}>
       <Container component="main" maxWidth="sm">
         <CssBaseline />
         <Box
@@ -111,13 +104,14 @@ const Register = () => {
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}><LockOutlinedIcon /></Avatar>
           <Typography component="h1" variant="h5">Nova conta</Typography>
 
-          <Box component="form" onSubmit={(e) => handleSubmit(e)} sx={{ mt: 3 }}>
+          <Box component="form" sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Seu nome"
                   autoFocus
+                  data={data.ownerName}
                   onChange={(e) => setData({ ...data, ownerName: e.target.value })}
                 />
               </Grid>
@@ -125,15 +119,15 @@ const Register = () => {
                 <TextField
                   fullWidth
                   label="Nome do seu negócio"
+                  data={data.fantasyName}
                   onChange={(e) => setData({ ...data, fantasyName: e.target.value })}
                 />
               </Grid>
               <Grid item xs={12} sm={12}>
                 <TextField
-                  label="Descrição (Conte um pouco da sua loja...)"
+                  label="Descrição (fale sobre seu negócio)"
                   value={data.description}
                   onChange={(e) => setData({ ...data, description: e.target.value })}
-                  InputLabelProps={{ shrink: true }}
                   rows={3}
                   multiline
                   fullWidth
@@ -143,8 +137,10 @@ const Register = () => {
                 <TextField
                   fullWidth
                   label="Link personalizado"
+                  value={data.storeUrl}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">
+                    startAdornment: 
+                    <InputAdornment position="start" sx={{ color: '#ff7f32' }}>
                       {'https://meuapetite.com'}/
                     </InputAdornment>
                   }}
@@ -154,8 +150,18 @@ const Register = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Email Principal"
+                  value={data.email}
+                  label="Email do negócio"
                   onChange={(e) => setData({ ...data, email: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  type="tel"
+                  value={data.whatsapp}
+                  label="Whatsapp do negócio"
+                  onChange={(e) => setData({ ...data, whatsapp: e.target.value })}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -164,6 +170,7 @@ const Register = () => {
                   label="Senha"
                   type="password"
                   name="password"
+                  value={data.password}
                   onChange={(e) => setData({ ...data, password: e.target.value })}
                 />
               </Grid>
@@ -173,6 +180,7 @@ const Register = () => {
                   label="Repita a senha"
                   type="password"
                   name="passwordRepeat"
+                  value={data.passwordRepeat}
                   onChange={(e) => setData({ ...data, passwordRepeat: e.target.value })}
                 />
               </Grid>
@@ -183,9 +191,16 @@ const Register = () => {
                 />
               </Grid>
             </Grid>
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+
+            <Button 
+              fullWidth 
+              variant="contained" 
+              sx={{ mt: 3, mb: 2 }}
+              onClick={handleSubmit}
+            >
               Cadastrar
             </Button>
+
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link href="/login">Já tem uma conta? Entre agora!</Link>
@@ -193,12 +208,15 @@ const Register = () => {
             </Grid>
           </Box>
         </Box>
+
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 5 }}>
           {'Copyright © '}
           <Link color="inherit" href="">Meu apetite </Link>
           {new Date().getFullYear()}
         </Typography>
       </Container>
+
+      <BackdropLoading loading={loading} />
     </ThemeProvider>
   );
 };

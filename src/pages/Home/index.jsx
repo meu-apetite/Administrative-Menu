@@ -1,18 +1,13 @@
-import { styled } from '@mui/material/styles';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
-import QRCode from 'react-qr-code';
-import { Bar, } from 'react-chartjs-2';
-import { ApiService } from 'services/api.service';
 import { useContext, useEffect, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, CardHeader, CardContent } from '@mui/material';
+import QRCode from 'react-qr-code';
+import { Bar } from 'react-chartjs-2';
+import { ApiService } from 'services/api.service';
+import { AuthContext } from 'contexts/auth';
 import Chart from 'chart.js/auto';
 import * as S from './style';
-import { AuthContext } from 'contexts/auth';
+import StepperCompany from './StepperCompany';
 
-const StyledCard = styled(Card)({ maxWidth: '100%', marginBottom: '20px' });
-const ChartContainer = styled('div')({ width: '100%' });
 
 const hexToRgba = (hex, alpha) => {
   hex = hex.replace(/^#/, '');
@@ -23,7 +18,7 @@ const hexToRgba = (hex, alpha) => {
   const clampedAlpha = Math.min(1, Math.max(0, alpha));
   const rgba = `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`;
   return rgba;
-}
+};
 
 const Home = () => {
   const { company } = useContext(AuthContext);
@@ -57,7 +52,7 @@ const Home = () => {
         {
           label: 'Quantidade de Pedidos',
           backgroundColor: hexToRgba(company.custom.colorSecondary, 0.6) || 'rgba(75,192,192,0.4)',
-          borderColor: hexToRgba(company.custom.colorSecondary, 1) ||'rgba(75,192,192,1)',
+          borderColor: hexToRgba(company.custom.colorSecondary, 1) || 'rgba(75,192,192,1)',
           borderWidth: 1,
           hoverBackgroundColor: 'rgba(75,192,192,0.6)',
           hoverBorderColor: 'rgba(75,192,192,1)',
@@ -108,58 +103,63 @@ const Home = () => {
     });
   };
 
-
   useEffect(() => {
     getOrders();
   }, []);
 
   return (
-    <div>
-      <S.CardWelcome>
-        <CardContent sx={{ flex: '1 0 auto', p: 0 }}>
-          <Typography component="div" variant="h5">Bem-vindo(a)!</Typography>
-          <Typography variant="subtitle1" color="text.secondary" component="div">
-            Este é o seu painel administrativo. Aqui, você pode adicionar e excluir
-            produtos, gerenciar categorias e ajustar as configurações e aparência
-            do seu cardápio. Aponte sua camêra para o qr para visitar seu cardapio.
-          </Typography>
-        </CardContent>
-        <Box sx={{ border: ' 2px solid #fff', width: 'fit-content', m: 'auto' }}>
-          <QRCode value={'https://meuapetite.com/' + company.storeUrl} />
-        </Box>
-      </S.CardWelcome>
+    <>
+      {company.online ? (
+        <div>
+          <S.CardWelcome>
+            <CardContent sx={{ flex: '1 0 auto', p: 0 }}>
+              <Typography component="div" variant="h5">Bem-vindo(a)!</Typography>
+              <Typography variant="subtitle1" color="text.secondary" component="div">
+                Este é o seu painel administrativo. Aqui, você pode adicionar e excluir
+                produtos, gerenciar categorias e ajustar as configurações e aparência
+                do seu cardápio. Aponte sua camêra para o qr para visitar seu cardapio.
+              </Typography>
+            </CardContent>
+            <Box sx={{ border: ' 2px solid #fff', width: 'fit-content', m: 'auto' }}>
+              <QRCode value={'https://meuapetite.com/' + company.storeUrl} />
+            </Box>
+          </S.CardWelcome>
 
-      <Typography variant="h6">Ultímos 30 dias</Typography>
-      <S.SectionChart>
-        <StyledCard>
-          <CardHeader title={<Typography variant="h6">Pedidos</Typography>} />
-          <CardContent>
-            <ChartContainer sx={{ width: '100%' }}>
-              {
-                (barChartData !== null) && <Bar
-                  data={barChartData}
-                  options={{
-                    scales: { x: { type: 'category' }, y: { beginAtZero: true, } },
-                  }}
-                />
-              }
-            </ChartContainer>
-          </CardContent>
-        </StyledCard>
+          <Typography variant="h6">Ultímos 30 dias</Typography>
+          <S.SectionChart>
+            <S.StyledCard>
+              <CardHeader title={<Typography variant="h6">Pedidos</Typography>} />
+              <CardContent>
+                <S.ChartContainer sx={{ width: '100%' }}>
+                  {
+                    (barChartData !== null) && <Bar
+                      data={barChartData}
+                      options={{
+                        scales: { x: { type: 'category' }, y: { beginAtZero: true, } },
+                      }}
+                    />
+                  }
+                </S.ChartContainer>
+              </CardContent>
+            </S.StyledCard>
 
-        <StyledCard>
-          <CardHeader title={<Typography variant="h6">Mais vendidos</Typography>} />
-          <CardContent>
-            <ChartContainer sx={{ width: '100%' }}>
-              {(doughnutChartData !== null) &&
-                <Bar data={doughnutChartData} options={{ indexAxis: 'y' }} />
-              }
-            </ChartContainer>
-          </CardContent>
-        </StyledCard>
-      </S.SectionChart>
-    </div>
+            <S.StyledCard>
+              <CardHeader title={<Typography variant="h6">Mais vendidos</Typography>} />
+              <CardContent>
+                <S.ChartContainer sx={{ width: '100%' }}>
+                  {(doughnutChartData !== null) &&
+                    <Bar data={doughnutChartData} options={{ indexAxis: 'y' }} />
+                  }
+                </S.ChartContainer>
+              </CardContent>
+            </S.StyledCard>
+          </S.SectionChart>
+        </div>
+      ) : (
+        <StepperCompany company={company} />
+      )}
+    </>
   );
-}
+};
 
 export default Home;

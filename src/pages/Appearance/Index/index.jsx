@@ -68,7 +68,7 @@ const Create = () => {
       colorPrimary: company.custom.colorPrimary,
       colorSecondary: company.custom.colorSecondary,
     });
-    setLogo(company.custom.logo.url);
+    setLogo(company.custom.logo?.url);
   }, [company]);
 
   return (

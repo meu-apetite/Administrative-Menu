@@ -75,7 +75,7 @@ const MiniDrawer = () => {
           <S.WrapperIntro>
             <CustomCardHeader
               sx={{ flexDirection: "row-reverse", gap: 1, pr: 0, m: 0 }}
-              avatar={<Avatar src={company.custom.logo.url} />}
+              avatar={<Avatar src={company.custom.logo?.url} />}
               title={company.fantasyName}
             />
           </S.WrapperIntro>
@@ -85,10 +85,15 @@ const MiniDrawer = () => {
       <S.Drawer variant="permanent" open={open}>
         <S.DrawerHeader>
           <Button
-            variant="outlined"
-            color="secondary"
             onClick={() => changeTheme(themeMode === 'dark' ? 'light' : 'dark')}
-            startIcon={<i class="fa-solid fa-circle-half-stroke"></i>}
+            startIcon={<i className="fa-solid fa-circle-half-stroke"></i>}
+            sx={{ 
+              color: themeMode === 'dark' ? '#fff' : '#092635',
+              borderColor: themeMode === 'dark' ? '#fff' : '#092635',
+              display: 'flex',
+              gap: '0.7rem',
+              pl: '6px'
+            }}
           >
             Modo {themeMode === 'dark' ? 'light' : 'dark'} 
           </Button>

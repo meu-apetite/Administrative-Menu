@@ -26,7 +26,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({ email: '', password: '' });
 
-
   const checkSuport = () => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
     return true;
@@ -44,14 +43,24 @@ export default function Login() {
   };
 
   const registerServiceWorker = async () => {
-    const registration = await navigator.serviceWorker.register('sw.js');
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlB64ToUint8Array(
-        'BIKAYUcYP8q6CbBFRfBJsOz9zJcl8siDpqr7vAu5I1Y8q5M0bW2UGpimc4lwzEVD4VlpUzeZ7HRyNjh6J7xOOQI'
-      ),
-    });
-    return subscription;
+    try {
+      const registration = await navigator.serviceWorker.register('sw.js');
+      const existingSubscription = await registration.pushManager.getSubscription();
+  
+      if (existingSubscription) await existingSubscription.unsubscribe();
+
+      const newSubscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlB64ToUint8Array(
+          'BIKAYUcYP8q6CbBFRfBJsOz9zJcl8siDpqr7vAu5I1Y8q5M0bW2UGpimc4lwzEVD4VlpUzeZ7HRyNjh6J7xOOQI'
+        ),
+      });
+  
+      return newSubscription;
+    } catch (error) {
+      console.error('Erro ao registrar o Service Worker ou se inscrever para notificações:', error);
+      throw error; 
+    }
   };
 
   const requestNotificationPermission = async () => {
@@ -97,6 +106,7 @@ export default function Login() {
         return document.location.href = '/home';
       }      
     } catch (error) {
+      console.log(error)
       return toast.error(error.response.data.message);
     } finally {
       setLoading(false);
