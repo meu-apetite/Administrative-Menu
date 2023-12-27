@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export class ApiService {
-  // #baseUrl = 'https://meuapetite.com/api';
-  #baseUrl = 'http://192.168.0.135:5000/api';
+  #baseUrl = 'https://meuapetite.com/api';
+  // #baseUrl = 'http://192.168.0.135:5000/api';
 
   isAuth = false;
   #token;
