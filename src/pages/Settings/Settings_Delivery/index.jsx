@@ -6,7 +6,7 @@ import * as S from './style';
 import ButtonFloat from 'components/ButtonFloat';
 import BackdropLoading from 'components/BackdropLoading';
 
-const Delivery = (props) => {
+const Settings_Delivery = (props) => {
   const apiService = new ApiService();
   const { toast, company, setCompany } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ const Delivery = (props) => {
 
       const response = await apiService.put('/admin/company/settings-delivery', form);
       setCompany(response.data);
-      toast.success('Atualizado!');
+      toast.success('Dados atualizados!');
     } catch (error) {
       console.log(error);
       toast.error('Não foi possível atualizar os dados');
@@ -173,4 +173,4 @@ const Delivery = (props) => {
   );
 };
 
-export default Delivery;
+export default Settings_Delivery;

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Box, ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';

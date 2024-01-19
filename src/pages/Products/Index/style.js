@@ -1,10 +1,10 @@
-import { Card, CardContent, CardMedia } from '@mui/material';
+import { Button, Card, CardContent, CardMedia } from '@mui/material';
 import { styled } from '@mui/system';
 
 export const ContainerProducts = styled('main')({
   display: 'flex',
   flexDirection: 'column',
-  gap: 32
+  gap: 24
 });
 
 export const ModalContainer = styled('div')({
@@ -115,7 +115,52 @@ export const WrapperActions = styled('div')(({ theme }) => ({
   }
 }));
 
+export const SearchContainer = styled('div')(({ theme }) => ({
+  display: 'flex',
+  marginBottom: '8px',
+
+  input: {
+    flex: 1,
+    padding: '8px',
+    marginRight: '8px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+  },
+
+  button: {
+    padding: '8px',
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+}));
+
+export const FilterContainer = styled('div')(({ theme }) => ({
+  display: 'flex',
+  marginBottom: '32px',
+
+  select: {
+    padding: '8px',
+    marginRight: '8px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+  },
+
+  button: {
+    padding: '8px',
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+}));
 
 
-
-
+export const CustomButton = styled(Button)({
+  '&:hover': {
+    backgroundColor: 'rgba(0, 123, 255, 0.8)'
+  },
+});

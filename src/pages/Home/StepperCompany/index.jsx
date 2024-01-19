@@ -114,11 +114,9 @@ const StepperCompany = () => {
     return (
       <div>
         <Typography variant="h6">Atualizar logo</Typography>
-        <Typography variant="p">
-          Envie uma foto da sua logo
-        </Typography> <br />
+        <Typography variant="p">Carregue a foto da logomarca do seu negócio</Typography> <br />
         <Button sx={{ mt: 1 }} variant="contained" onClick={handleGoToAddress}>
-          Ir para tela de endereço
+          Ir para tela de aparência
         </Button>
       </div>
     );
@@ -135,18 +133,39 @@ const StepperCompany = () => {
         <Step key={1} completed={company?.address?.zipCode}>
           <StepLabel></StepLabel>
         </Step>
-        <Step key={2} completed={company.custom.logo?.url?.length > 0}>
+        <Step key={2} completed={company?.custom.logo?.url?.length > 0}>
           <StepLabel></StepLabel>
         </Step>
       </Stepper>
 
-      {activeStep === 0 && <Step1 />}
-      {activeStep === 1 && <Step2 />}
-      {activeStep === 2 && <Step3 />}
+      {
+        activeStep === 0 &&
+        <>
+          <Step1 />
+          {company?.verifyEmail
+            && <ButtonFloat text="Próxima etapa" onClick={() => setActiveStep(activeStep + 1)} />
+          }
+        </>
+      }
 
       {
-        activeStep <= 1 &&
-        <ButtonFloat text="Próxima etapa" onClick={() => setActiveStep(activeStep + 1)} />
+        activeStep === 1 &&
+        <>
+          <Step2 />
+          {company?.address?.zipCode
+            && <ButtonFloat text="Próxima etapa" onClick={() => setActiveStep(activeStep + 1)} />
+          }
+        </>
+      }
+
+      {
+        activeStep === 2 &&
+        <>
+          <Step3 />
+          {company?.custom.logo?.url?.length
+            && <ButtonFloat text="Próxima etapa" onClick={() => setActiveStep(activeStep + 1)} />
+          }
+        </>
       }
     </Container>
   );

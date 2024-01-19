@@ -1,23 +1,34 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Box, Tab, Tabs } from '@mui/material';
 import Header from 'components/Header';
-import OpeningHours from '../OpeningHours';
-import Delivery from '../Delivery';
-import InfoAdmin from '../InfoAdmin';
-import InfoContact from '../InfoContact';
 import * as S from './style';
-import { AuthContext } from 'contexts/auth';
 
 const Settings = () => {
-  const [tabValue, setTabValue] = useState('orderTime');
-  const { company } = useContext(AuthContext);
-  const [width, setWidth] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
   const handleResize = () => setWidth(window.innerWidth);
+  const [width, setWidth] = useState(0);
+  const [tabValue, setTabValue] = useState('openinghours');
 
   useEffect(() => {
     handleResize();
     window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
+
+  useEffect(() => {
+    const tabValue = location.pathname.split('/').pop();
+    if (tabValue !== 'settings') {
+      setTabValue(tabValue);
+    } else {
+      const firstTabValue = 'openinghours';
+      setTabValue(firstTabValue);
+      navigate(firstTabValue);
+    }
+  }, [location.pathname]);
 
   return (
     (width > 0) && (
@@ -25,33 +36,22 @@ const Settings = () => {
         <Header title="Configurações" back={-1} />
 
         <S.WrapperTabs>
-            <Box
-              sx={{ width: { xs: (width - 40) + 'px', sm: '100%' }, bgcolor: 'background.paper' }}
+          <Box sx={{ width: { xs: (width - 40) + 'px', sm: '100%' }, bgcolor: 'background.paper' }}>
+            <Tabs
+              value={tabValue}
+              onChange={(e, v) => navigate(v)}
+              variant="scrollable"
+              scrollButtons="auto"
+              wrapped
             >
-              <Tabs
-                value={tabValue}
-                onChange={(e, v) => setTabValue(v)}
-                variant="scrollable"
-                scrollButtons="auto"
-                wrapped
-              >
-                <Tab value="orderTime" label="Horário de pedido" />
-                <Tab value="delivery" label="Delivery" />
-                <Tab value="contact" label="Opções de contato" />
-                <Tab value="admin" label="Administrador" />
-              </Tabs>
-            </Box>
+              <Tab value="openinghours" label="Horário de pedido" />
+              <Tab value="delivery" label="Delivery" />
+              <Tab value="infocontact" label="Opções de contato" />
+              <Tab value="infoadmin" label="Administrador" />
+            </Tabs>
+          </Box>
         </S.WrapperTabs>
-
-        {tabValue === 'orderTime' && (
-          <OpeningHours 
-            openingHours={company?.settings.openingHours} 
-            setTabValue={setTabValue} 
-          />
-        )}
-        {tabValue === 'delivery' && <Delivery setTabValue={(v) => setTabValue(v)} />}
-        {tabValue === 'contact' && <InfoContact setTabValue={(v) => setTabValue(v)} />}
-        {tabValue === 'admin' && <InfoAdmin setTabValue={(v) => setTabValue(v)} />}
+        <Outlet />
       </S.Container>
     )
   );

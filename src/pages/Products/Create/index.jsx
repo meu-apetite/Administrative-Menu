@@ -17,43 +17,22 @@ const Create = () => {
   const [tabCurrent, setTabCurrent] = useState(0);
   const [dataInit, setDataInit] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({
-    name: '',
-    description: '',
-    code: '',
-    price: 0,
-    discountPrice: 0,
-    status: true,
-    category: '',
-    unit: '',
-    images: [],
-  });
+  const [data, setData] = useState(null);
   const [complements, setComplements] = useState([]);
   const [complementsErrors, setComplementsErrors] = useState([]);
 
-  const createComplement = async () => {
-    try {
-      const response = await apiService.post('/admin/complement', complements);
-      return response.data;
-    } catch (error) {
-      toast.error(
-        error.response.data?.message ||
-        'Não foi possível criar o complemento do produto',
-      );
-    }
-  };
-
   const validateData = () => {
     const errors = [];
-
-    if (data.images?.length <= 0) errors.push('Imagem é obrigatório');
-    if (!data.name?.trim().length) errors.push('Nome é obrigatório');
-    if (isNaN(Number(data.price))) errors.push('Preço é obrigatório');
-    if (!isNaN(Number(data.price))) {
-      if (data.price <= 0) errors.push('Preço deve ser maior que zero');
-    } 
-    if (data.discountPrice && !data.discountPrice > 0) errors.push('Preço do desconto inválido');
-    if (!data.category) errors.push('Categoria é obrigatório');
+    if (data?.images === undefined) errors.push('Imagem é obrigatório');
+    if (data?.images?.length <= 0) errors.push('Imagem é obrigatório');
+    if (!data?.name?.trim().length) errors.push('Nome é obrigatório');
+    if (isNaN(Number(data?.price))) errors.push('Preço é obrigatório');
+    if (!isNaN(Number(data?.price))) {
+      if (data?.price <= 0) errors.push('Preço deve ser maior que zero');
+    }
+    if (data?.discountPrice && !data.discountPrice > 0) errors.push('Preço do desconto inválido');
+      if (!data?.unit?.trim().length) errors.push('Unidade de medida é obrigatório');
+    if (!data?.category) errors.push('Categoria é obrigatório');
     if (errors.length <= 0) return true;
 
     toast.error(errors.map(error => `• ${error}.`).join('\n'));
@@ -62,38 +41,55 @@ const Create = () => {
 
   const handleSubmit = async () => {
     if (!validateData()) return;
-
-    let complementInsertIds;
-
-    if (complements.length) {
-      if (complementsErrors.length) return toast.error(complementsErrors.join('\n\n'));
-      complementInsertIds = await createComplement();
-      if (complementInsertIds.success === false) {
-        setLoading(false);
-        return toast.error(complementInsertIds.message);
+    if (complements.length >= 1) {
+      if (complementsErrors.length >= 1) {
+        return toast.error(complementsErrors.map(error => `• ${error}`).join('\n'));
       }
+    
+      const newComplements = complements
+        .map(c => {
+          if (!c || !c.options || c.options.length < 1) return {};
+    
+          c.options = c.options
+            .map(option => {
+              if (!option.price) option.price = 0;
+              return option;
+            })
+            .filter(option => option.name && option.name.trim().length > 0);
+    
+          return c;
+        })
+        .filter(c => c.options && c.options.length > 0);
+    
+      console.log(newComplements);
+    
+      setComplements(newComplements);
     }
+         
 
     try {
       const formData = new FormData();
       formData.append('name', data.name);
-      formData.append('description', data.description);
-      formData.append('code', data.code);
+      formData.append('description', data.description || '');
+      formData.append('code', data.code || '');
       formData.append('price', data.price);
       formData.append('discountPrice', data.discountPrice);
       formData.append('isActive', data.status);
       formData.append('category', data.category);
       formData.append('unit', data.unit);
-      if (complementInsertIds) formData.append('complements', JSON.stringify(complementInsertIds));
       formData.append('images', data.images[0]);
+      if (complements.length >= 1) {
+        formData.append('complements', JSON.stringify(complements));
+      }
 
       setLoading('Salvando dados...');
       await apiService.post('/admin/products', formData, true);
 
       toast.success('Produto cadastrado');
+      return
       setTimeout(() => navigate({ pathname: '/products' }), 700);
-    } catch (error) {
-      toast.error(error.response.data?.message || 'Erro ao cadastrar produto');
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'Erro ao cadastrar produto');
     } finally {
       setLoading(false);
     }
@@ -129,9 +125,16 @@ const Create = () => {
 
       <Box component="section" sx={{ mb: '48px' }}>
         {tabCurrent === 0 && (
-          (state?.duplicate) 
-            ? dataInit && <FormProduct initialData={dataInit} getData={data => setData(data)} />
-            : <FormProduct initialData={data} getData={data => setData(data)} />
+          (state?.duplicate)
+            ? dataInit &&
+            <FormProduct
+              initialData={dataInit}
+              getData={data => setData(data)}
+            />
+            : <FormProduct
+              data={data}
+              getData={data => setData(data)}
+            />
         )}
 
         {tabCurrent === 1 && (

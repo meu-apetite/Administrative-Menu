@@ -100,19 +100,19 @@ const Update = () => {
   }, []);
 
   return (
-    <section>
-      <Header title="Editar produto" back={-1} />
+    <Box component="section">
+    <Header title="Editar produto" back={-1} />
 
-      <Tabs value={tabCurrent} onChange={handleChange} variant="scrollable">
-        <Tab label="Detalhes" />
-        <Tab label="Complementos" />
-      </Tabs>
+    <Tabs value={tabCurrent} onChange={handleChange} variant="scrollable" >
+      <Tab label="Detalhes" />
+      <Tab label="Complementos" />
+    </Tabs>
 
-      <Box component="section" sx={{ mb: '48px' }}>
-        {tabCurrent === 0 ? (
+    <Box component="section" sx={{ mb: '48px' }}>
+    {tabCurrent === 0 ? (
           dataProduct
           && <FormProduct 
-              initialData={dataProduct} 
+              data={dataProduct} 
               getData={data => setDataProduct(data)} 
             />
         ) : (
@@ -126,11 +126,11 @@ const Update = () => {
             />
           </section>
         )}
-      </Box>
-      <ButtonFloat text="Salvar" onClick={() => handleSubmit()} />
+    </Box>
+    <ButtonFloat text="Salvar" onClick={() => handleSubmit()} />
 
-      <BackdropLoading loading={loading} />
-    </section>
+    <BackdropLoading loading={loading} />
+  </Box>
   );
 };
 

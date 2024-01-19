@@ -1,40 +1,113 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Grid, Menu, Pagination } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
-import { Box, Typography, IconButton, Toolbar, AppBar, ListItem, Dialog, List, Slide } from '@mui/material';
+import React, { useState, useEffect, useContext } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { Button, Chip, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Input, Menu, MenuItem, Pagination, Select, TextField } from '@mui/material';
+import { Box, Typography, IconButton, Toolbar, AppBar, ListItem, Dialog, List, Slide } from '@mui/material';
+import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { ApiService } from 'services/api.service';
+import { orderStatus } from 'utils/orderStatus';
+import { AuthContext } from 'contexts/auth';
 import Header from 'components/Header';
+import BackdropLoading from 'components/BackdropLoading';
 import * as S from './style';
 
 const Transition = React.forwardRef((props, ref) => {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'OrderReceived':
+      return '#2196F3';
+    case 'Processing':
+      return '#00BCD4';
+    case 'WaitingForPaymentConfirmation':
+      return '#FFC107';
+    case 'Shipped':
+      return '#4CAF50';
+    case 'Concluded':
+      return '#4CAF50';
+    case 'Cancelled':
+      return '#FF3D00';
+    case 'WaitingForPickup':
+      return '#00BCD4';
+    default:
+      return '#808080';
+  }
+};
+
 export default function Index() {
   const apiService = new ApiService();
+  const { toast } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
   const [currentOrder, setCurrentOrder] = useState(null);
   const [totalPages, setTotalPages] = useState([]);
   const [page, setPage] = useState([]);
   const [modalView, setModalView] = useState(false);
+  const [modalChangeStatus, setModalChangeStatus] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const modalViewOpen = (order) => {
     setCurrentOrder(order);
     setModalView(true);
-  }
+  };
 
   const modalViewClose = () => setModalView(false);
 
+  const modalChangeStatusOpen = (order) => {
+    setCurrentOrder(order);
+    setSelectedStatus(order.status.name);
+    setModalChangeStatus(true);
+  };
+
+  const modalChangeStatusClose = () => setModalChangeStatus(false);
+
   const getOrders = async () => {
     try {
-      const { data } = await apiService.get('/admin/orders?page=1');
+      setLoading('Carregando');
+
+      const queryParams = new URLSearchParams();
+  
+      if (searchTerm) queryParams.append('searchTerm', searchTerm);
+      if (filter) queryParams.append('filter', filter);
+      if (startDate) queryParams.append('startDate', startDate);
+      if (endDate) queryParams.append('endDate', endDate);
+      if (selectedStatus) queryParams.append('selectedStatus', selectedStatus);
+      if (categoryFilter) queryParams.append('categoryFilter', categoryFilter);
+  
+      const url = `/admin/orders?page=1&${queryParams.toString()}`;
+      
+      const { data } = await apiService.get(url);
+      
       setOrders(data.orders);
       setTotalPages(data.totalPages);
       setPage(data.page);
     } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const changeStatus = async () => {
+    try {
+      setLoading('Atualizando');
+      const { data } = await apiService.put('/admin/orders', {
+        orderId: currentOrder._id, status: selectedStatus
+      });
+      modalChangeStatusClose();
+      getOrders();
+      toast.success('Pedido atualizado!');
+    } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,23 +118,85 @@ export default function Index() {
   return (
     <Box sx={{ height: 430, width: '100%' }}>
       <Header title="Pedidos" buttonText="Atualizar" />
+
+      <S.SearchContainer>
+        <input
+          type="text"
+          placeholder="Busque por cliente ou número do pedido"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <S.CustomButton onClick={getOrders}>Buscar</S.CustomButton>
+      </S.SearchContainer>
+
+      <S.FilterContainer>
+        <div style={{ display: 'flex' }}>
+          <label>
+            Data inicio <br />
+            <input
+              type="date"
+              label="Data inicio"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </label>
+          <label>
+            Data fim <br />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </label>
+        </div>
+        <label>
+          Status <br />
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+          >
+            <option value="">Todos</option>
+            {orderStatus.map((status) => <option key={status.name} value={status.name}>{status.label}</option>)}
+          </select>
+        </label>
+        <Button onClick={() => getOrders()} className="button">Filtrar</Button>
+      </S.FilterContainer>
+
+
+
       <S.ContainerProducts>
         {orders.map((item) => {
           return (
             <S.CardCustom>
               <S.WrapperAction>
+                <Chip
+                  sx={{
+                    maxWidth: '200px',
+                    background: getStatusColor(item?.status?.name),
+                    fontWeight: 600,
+                    color: '#fff'
+                  }}
+                  label={item?.status?.label}
+                  variant="filled"
+                />
+
                 <PopupState variant="popover">
                   {(popupState) => (
                     <>
-                      <Button {...bindTrigger(popupState)}>
-                        Opções <KeyboardArrowDownIcon />
-                      </Button>
+                      <Button {...bindTrigger(popupState)}>Opções <KeyboardArrowDownIcon /></Button>
+
                       <Menu {...bindMenu(popupState)}>
                         <S.MenuItemCuston onClick={() => {
                           modalViewOpen(item);
                           popupState.close();
                         }}>
                           <span className="fa fa-circle-info"></span> Ver detalhes
+                        </S.MenuItemCuston>
+                        <S.MenuItemCuston onClick={() => {
+                          modalChangeStatusOpen(item);
+                          popupState.close();
+                        }}>
+                          <span className="fa fa-edit"></span> Alterar status
                         </S.MenuItemCuston>
                         <S.MenuItemCuston onClick={popupState.close}>
                           <span className="fa fa-file-pdf"></span> Baixar recibo
@@ -85,9 +220,6 @@ export default function Index() {
                     </span>
                     <span>
                       <strong>Data: </strong> {new Date(item.date).toLocaleString('pt-BR')}
-                      {/* {
-                        (item?.status === 'awaiting-approval') && 'Aguardando aprovação'
-                      } */}
                     </span>
                     <span style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>
@@ -162,7 +294,7 @@ export default function Index() {
                         {currentOrder?.address?.city}, {'BA'}, {'44400432'}
                       </Typography>
                     </>
-                  ) : (     
+                  ) : (
                     <Typography variant="h6">**Pedido para retirada**</Typography>
                   )}
                 </Grid>
@@ -186,7 +318,6 @@ export default function Index() {
                         Valor:&#160;<strong>{item.priceTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
                       </ListItem>
                     </div>
-                    <img src={item.imageUrl} />
                   </S.ProductInfo>
                 ))}
               </List>
@@ -195,7 +326,33 @@ export default function Index() {
               </Typography>
             </S.CustomPaper>
           </Dialog>
-        )}
+        )
+      }
+
+      <Dialog open={modalChangeStatus} onClose={modalChangeStatusClose}>
+        <DialogTitle>Pedido #{currentOrder?.id}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Atualize o status do pedido para refletir a situação atual do mesmo.</DialogContentText>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="h6">Novo status:</Typography>
+              <Select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                fullWidth
+              >
+                {orderStatus.map((status) => <MenuItem value={status.name}>{status.label}</MenuItem>)}
+              </Select>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={modalChangeStatusClose}>Cancelar</Button>
+          <Button onClick={changeStatus}>Confirmar</Button>
+        </DialogActions>
+      </Dialog>
+
+      <BackdropLoading loading={loading} />
     </Box>
   );
 }

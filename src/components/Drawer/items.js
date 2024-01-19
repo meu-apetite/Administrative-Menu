@@ -24,6 +24,13 @@ const items = [
       Icon: () => <i className="fas fa-shopping-cart"></i>,
     },
 
+
+    {
+      text: 'Financeiro',
+      link: '/financial',
+      Icon: () => <i className="fas fa-shopping-cart"></i>,
+    },
+
     {
       text: 'Formas de pagamento',
       link: '/payment-method',

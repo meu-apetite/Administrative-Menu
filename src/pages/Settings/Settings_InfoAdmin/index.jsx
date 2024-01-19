@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, Button, Grid, TextField } from '@mui/material';
+import { Box, Grid, TextField } from '@mui/material';
 import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
-import * as S from './style';
 import ButtonFloat from 'components/ButtonFloat';
 
-const InfoAdmin = () => {
+const Settings_InfoAdmin = () => {
   const apiService = new ApiService();
   const { toast, setLoading, company, setCompany } = useContext(AuthContext);
   const [data, setData] = useState({ name: '', phoneNumber: '', email: '' });
@@ -16,8 +15,8 @@ const InfoAdmin = () => {
 
     try {
       const response = await apiService.put('/admin/company/owner', data);
-      setData(response.data);
-      setCompany({ ...company, owner: response.data })
+      setCompany({ ...company, owner: response.data });
+      toast.success('Dados atualizados!');
     } catch (error) {
       console.log(error);
     } finally {
@@ -34,6 +33,7 @@ const InfoAdmin = () => {
   };
 
   useEffect(() => {
+    console.log('222')
     getData();
   }, []);
 
@@ -83,4 +83,4 @@ const InfoAdmin = () => {
   );
 };
 
-export default InfoAdmin;
+export default Settings_InfoAdmin;

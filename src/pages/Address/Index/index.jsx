@@ -1,63 +1,72 @@
-import { useContext, useEffect, useState } from 'react'
-import { Box, Button, Grid, TextField } from '@mui/material'
-import { AuthContext } from 'contexts/auth'
-import { ApiService } from 'services/api.service'
-import Header from 'components/Header'
-import FindAddress from 'components/FindAddress'
-import { propsTextField } from 'utils/form'
-import * as S from './style.js'
+import { useContext, useEffect, useState } from 'react';
+import { Box, Button, Grid, TextField } from '@mui/material';
+import { AuthContext } from 'contexts/auth';
+import { ApiService } from 'services/api.service';
+import Header from 'components/Header';
+import FindAddress from 'components/FindAddress';
+import { propsTextField } from 'utils/form';
+import * as S from './style.js';
 
 const Address = () => {
-  const apiService = new ApiService()
+  const apiService = new ApiService();
 
-  const { toast, setLoading, company, setCompany } = useContext(AuthContext)
+  const { toast, company, setCompany } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     city: '',
     district: '',
     street: '',
     zipCode: '',
-  })
-  const [openEditorAddress, setOpenEditorAddress] = useState(false)
+  });
+  const [openEditorAddress, setOpenEditorAddress] = useState(false);
 
   const getAddress = async () => {
-    if (!company?.address?.zipCode) return
-    setData(company.address)
-  }
+    if (!company?.address?.zipCode) return;
+    setData(company.address);
+  };
 
   const updateAddress = async (address) => {
-    // address: { street: string, number: number, zipCode: string, district: string, city: string }
     try {
-      setLoading('Atualizando endereço')
-      const { data } = await apiService.put('/admin/company/address', address)
-      setData(data)
-      toast.success('Endereço atualizado')
+      setLoading('Atualizando endereço');
+      const { data } = await apiService.put('/admin/company/address', address);
+      setCompany({ ...company, address: data });
+      setData(data);
+      toast.success('Endereço atualizado');
+
+      if (!company.online) window.location.reload(false);
     } catch (error) {
       toast.error(
         'Não foi possível atualizar o endereço. caso não esteja consiguindo, entre em contato conosco.',
-      )
+      );
     } finally {
-      setOpenEditorAddress(false)
-      setLoading(null)
+      setOpenEditorAddress(false);
+      setLoading(null);
     }
-  }
+  };
 
   useEffect(() => {
-    getAddress()
-  }, [])
+    getAddress();
+  }, []);
 
   return (
     <>
-      <Header title="Endereço do Estabelecimento" back={-1} />
+      <Header 
+        title="Endereço" 
+        back={-1} 
+        buttonText="Novo endereço"
+        buttonClick={() => setOpenEditorAddress(!openEditorAddress)}
+      />
+
       <Box component="section" noValidate>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12}>
             <span>
               {
                 data.zipCode.length >= 8
-                  ? 'Para mudar o endereço clique em "ADICIONAR ENDEREÇO"'
-                  : 'Registre o endereço para o seu negócio! Isso nos ajuda' 
-                    + ' a calcular o custo de entrega ou facilita para o' 
-                    + ' cliente que prefira retirar pessoalmente o pedido.' 
+                  ? 'Para mudar o endereço clique em "NOVO ENDEREÇO"'
+                  : 'Registre o endereço para o seu negócio! Isso nos ajuda'
+                  + ' a calcular o custo de entrega ou facilita para o'
+                  + ' cliente que prefira retirar pessoalmente o pedido.'
               }
             </span>
           </Grid>
@@ -113,28 +122,17 @@ const Address = () => {
               </Grid>
             </>
           )}
-
-          <Grid item xs={12} sm={12}>
-            <S.WrapperButtonSaved>
-              <Button
-                variant="contained"
-                onClick={() => setOpenEditorAddress(!openEditorAddress)}
-              >
-                {data.zipCode.length >= 8 ? 'Atualizar endereço' : 'Cadastrar endereço'}
-              </Button>
-            </S.WrapperButtonSaved>
-          </Grid>
-
+          
           {openEditorAddress && (
             <FindAddress
-              getAddress={(address) => updateAddress(address)}
-              closeModal={(address) => setOpenEditorAddress(false)}
+              getData={updateAddress}
+              closeModal={() => setOpenEditorAddress(false)}
             />
           )}
         </Grid>
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default Address
+export default Address;

@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, Button, Grid, TextField } from '@mui/material';
+import { Box, Grid, TextField } from '@mui/material';
 import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
 import ButtonFloat from 'components/ButtonFloat';
 import BackdropLoading from 'components/BackdropLoading';
 
-const InfoContact = () => {
+const Settings_InfoContact = () => {
   const apiService = new ApiService();
   const { toast, company, setCompany } = useContext(AuthContext);
   const [data, setData] = useState({ phoneNumber: '', email: '' });
@@ -18,9 +18,8 @@ const InfoContact = () => {
     try {
       const response = await apiService.put('/admin/company/contact', data);
       setData(response.data);
-      setCompany({ 
-        ...company, whastapp: response.data.whastapp, email: response.data.email 
-      });
+      setCompany({ ...company, whastapp: response.data.whastapp, email: response.data.email });
+      toast.success('Dados atualizados!');
     } catch (error) {
       console.log(error);
     } finally {
@@ -77,4 +76,4 @@ const InfoContact = () => {
   );
 };
 
-export default InfoContact;
+export default Settings_InfoContact;

@@ -40,21 +40,21 @@ const Create = () => {
 
   const updateLogo = async (e) => {
     try {
-      setLoading(true);
+      setLoading('Carregando...');
       const formData = new FormData();
       formData.append('logo', e.target.files[0]);
       const response = await apiService.post(
-        '/admin/company/logo',
-        formData,
-        true,
+        '/admin/company/logo', formData, true,
       );
       setLogo(response.data.url);
       setCompany({ 
         ...company,custom: { ...company.custom, logo: response.data 
-      } });
+      }});
       toast.success('Logo atualizada');
+      if (!company.online) window.location.reload(false);
     } catch (e) {
-      toast.error(e.data.message || 'Não foi possível atualizar a logo');
+      console.log(e)
+      toast.error(e.response.data?.message || 'Não foi possível atualizar a logo');
     } finally {
       setLoading(false);
     }

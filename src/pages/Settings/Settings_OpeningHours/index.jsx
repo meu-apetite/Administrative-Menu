@@ -5,7 +5,7 @@ import { ApiService } from 'services/api.service';
 import ButtonFloat from 'components/ButtonFloat/index.jsx';
 import BackdropLoading from 'components/BackdropLoading';
 
-const OpeningHours = ({ openingHours, }) => {
+const Settings_OpeningHours = ({ openingHours, }) => {
   const apiService = new ApiService();
 
   const { toast, company, setCompany } = useContext(AuthContext);
@@ -45,7 +45,7 @@ const OpeningHours = ({ openingHours, }) => {
   };
 
   useEffect(() => {
-    setHours(openingHours);
+    setHours(company?.settings.openingHours);
   }, [openingHours]);
 
   return (
@@ -85,4 +85,4 @@ const OpeningHours = ({ openingHours, }) => {
   );
 };
 
-export default OpeningHours;
+export default Settings_OpeningHours;

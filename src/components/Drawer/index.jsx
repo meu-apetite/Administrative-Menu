@@ -27,16 +27,14 @@ const MiniDrawer = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [routeActive, setRouteActive] = useState('home');
-  const { company, setIsMenuOpen, changeTheme, themeMode } = useContext(AuthContext);
+  const { company, changeTheme, themeMode } = useContext(AuthContext);
 
   const handleDrawerOpen = () => {
     setOpen(true);
     // button-float
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const handleDrawerClose = () => setOpen(false);
 
   const toLink = (link) => {
     if (link === 'logout') {
@@ -44,7 +42,7 @@ const MiniDrawer = () => {
       localStorage.removeItem('token');
       return window.location.reload();
     }
-    if (window.innerWidth <= 768) handleDrawerClose();
+    if (window.innerWidth <= 900) handleDrawerClose();
     setRouteActive(link)
     navigate(link);
   };

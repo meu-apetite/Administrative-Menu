@@ -17,8 +17,8 @@ import {
 import ImageIntro from 'assets/images/intro-login.webp';
 import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
-import * as S from './style';
 import BackdropLoading from 'components/BackdropLoading';
+import * as S from './style';
 
 export default function Login() {
   const apiService = new ApiService(false);
@@ -43,48 +43,44 @@ export default function Login() {
   };
 
   const registerServiceWorker = async () => {
-    try {
-      const registration = await navigator.serviceWorker.register('sw.js');
-      const existingSubscription = await registration.pushManager.getSubscription();
-  
-      if (existingSubscription) await existingSubscription.unsubscribe();
+    const registration = await navigator.serviceWorker.register('sw.js');
+    const existingSubscription = await registration.pushManager.getSubscription();
 
-      const newSubscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlB64ToUint8Array(
-          'BIKAYUcYP8q6CbBFRfBJsOz9zJcl8siDpqr7vAu5I1Y8q5M0bW2UGpimc4lwzEVD4VlpUzeZ7HRyNjh6J7xOOQI'
-        ),
-      });
-  
-      return newSubscription;
-    } catch (error) {
-      console.error('Erro ao registrar o Service Worker ou se inscrever para notificações:', error);
-      throw error; 
-    }
+    if (existingSubscription) await existingSubscription.unsubscribe();
+
+    const newSubscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlB64ToUint8Array(
+        'BIKAYUcYP8q6CbBFRfBJsOz9zJcl8siDpqr7vAu5I1Y8q5M0bW2UGpimc4lwzEVD4VlpUzeZ7HRyNjh6J7xOOQI'
+      ),
+    });
+
+    return newSubscription;
   };
 
   const requestNotificationPermission = async () => {
     const permission = await window.Notification.requestPermission();
 
-    if (permission !== 'granted') {
-      toast.error(
-        'Por favor, conceda permissão de notificação para o funcionamento adequado do sistema.',
-      );
-    }
+    if (permission !== 'granted') return false 
+    return true;
   };
 
   const handleSubmit = async (e) => {
     try {
       setLoading('Aguarde...');
       e.preventDefault();
-      let subscription = null
+      let subscription = null;
 
       if (!data.email) return toast.error('O Email não pode ficar em branco');
       if (!data.password) return toast.error('A Senha não pode ficar em branco');
 
       if (checkSuport()) {
-        await requestNotificationPermission();
-        subscription = await registerServiceWorker() || null;
+        const isPermission = await requestNotificationPermission();
+        if (!isPermission) {
+          toast.error('Por favor, conceda permissão de notificação para o funcionamento adequado do sistema.');
+        } else {
+          subscription = await registerServiceWorker() || null;
+        }
       }
 
       const response = await apiService.post('/auth/login', { ...data, subscription });
@@ -101,13 +97,12 @@ export default function Login() {
           { icon: "⚠️" }
         );
 
-        setTimeout(() => document.location.href = '/home', 5000)
+        setTimeout(() => document.location.href = '/home', 5000);
       } else {
         return document.location.href = '/home';
-      }      
-    } catch (error) {
-      console.log(error)
-      return toast.error(error.response.data.message);
+      }
+    } catch (e) {
+      return toast.error(e.response.data?.message);
     } finally {
       setLoading(false);
     }

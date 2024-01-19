@@ -15,7 +15,9 @@ import { propsTextField } from 'utils/form';
 import * as S from './style';
 
 const ComplementProduct = ({ complementsValue, getValue }) => {
-  const initComplement = { name: '', max: 1, min: 0, isRequired: null, options: [{ name: '', price: null }] };
+  const initComplement = { 
+    name: null, max: 1, min: 0, isRequired: null, options: [{ name: null, price: null }] 
+  };
 
   const [complements, setComplements] = useState([...complementsValue]);
 
@@ -40,8 +42,15 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
   const addComplementGroup = () => setComplements([...complements, initComplement]);
 
   const removeComplementGroup = (index) => {
-    // console.log(index);
-    // setComplements([...complements, initComplement]);
+    if (complements.length === 1) {
+      setComplements([initComplement]);
+      return;
+    }
+
+    let complementsCurrent = [...complements];
+    complementsCurrent = complementsCurrent.filter((item, i) => i !== index);
+    setComplements(complementsCurrent);
+    getValue(complementsCurrent, validateData())
   };
 
   const removeOption = (complementIndex, optionIndex) => {
@@ -53,16 +62,19 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
 
   const validateData = () => {
     const errors = [];
-    let hasOptionsEmpty = 0;
+    let inBlank = false;
 
     complements.forEach((item, index) => {
-      if (!item.name.trim().length) {
+      item.options.forEach((option, i) => {
+        if (option.name?.trim().length === 0) inBlank = true;
+      });
+      
+      if (!item.name?.trim().length && !inBlank) {
         errors.push(`O nome do ${index + 1}º complemento está em branco.`);
-        return errors;
       }
 
       if (item.isRequired === null || item.isRequired === undefined) {
-        errors.push(`Selecione se o complemento "${item.name.trim() || index}" é obrigatório ou não.`);
+        errors.push(`Selecione se o complemento "${item.name?.trim() || index}" é obrigatório ou não.`);
       }
 
       if (item.max <= 0) {
@@ -70,14 +82,10 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
       }
 
       if (item.isRequired && item.min <= 0) {
-        errors.push(`O complemento "${item.name.trim() || index}" é obrigatório, por isso a quantidade mínima deve ser maior que zero (0).`);
+        errors.push(`O complemento "${item.name?.trim() || index}" é obrigatório, por isso a quantidade mínima deve ser maior que zero (0).`);
       }
 
-      item.options.forEach((option, i) => {
-        if (!option.name.trim().length) hasOptionsEmpty++;
-      });
-
-      // if(hasOptionsEmpty) errors.push(`Existe opção em branco no complemento "${item.name.trim() || index}".`);
+      return errors;
     });
 
     return errors;

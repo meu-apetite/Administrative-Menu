@@ -20,14 +20,43 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState(''); 
 
-  const getProducts = async () => {
-    const { data } = await apiService.get(`/admin/products?page=1`);
-    setProducts(data.products?.reverse());
-    setTotalPages(data.totalPages);
-    setPage(data.page);
+  const getProducts = async (search, filter, filterCategory) => {
+    try {
+      setLoading('Carregando...');
+  
+      let url = `/admin/products?page=1`;
+  
+      if (search) {
+        url += `&search=${encodeURIComponent(search)}`;
+      }
+  
+      if (filter) {
+        url += `&filter=${encodeURIComponent(filter)}`;
+      }
+  
+      if (filterCategory) {
+        url += `&filterCategory=${encodeURIComponent(filterCategory)}`;
+      }
+  
+      const { data } = await apiService.get(url);
+  
+      setProducts(data.products);
+      setTotalPages(data.totalPages);
+      setPage(data.page);
+      window.scrollTo(0, 0);
+    } catch (error) {
+      console.log(error);
+      toast.error('Não foi possível obter os produtos');
+    } finally {
+      setLoading(null);
+    }
   };
-
+  
   const changePage = async (e, value) => {
     try {
       setLoading('Carregando...');
@@ -75,8 +104,17 @@ export default function Index() {
     return navigate('/products/create/', { state: { product, duplicate: true } });
   };
 
+  const getCategories = async () => {
+    try {
+      const response = await apiService.get('/admin/categories');
+      setCategories(response.data);
+    } catch (e) {}
+  };
+
+
   useEffect(() => {
     getProducts();
+    getCategories();
   }, []);
 
   return (
@@ -87,6 +125,31 @@ export default function Index() {
         buttonClick={() => navigate('create')}
         back={-1}
       />
+
+<S.SearchContainer>
+  <input
+    type="text"
+    placeholder="Buscar produtos..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
+  <S.CustomButton onClick={() => getProducts(searchTerm, filter)}>Buscar</S.CustomButton>
+</S.SearchContainer>
+
+<S.FilterContainer>
+  <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+    <option value="">Todos</option>
+    <option value="ativo">Ativos</option>
+    <option value="inativo">Inativos</option>
+  </select>
+  <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+    <option value="">Todas Categorias</option>
+    {categories.map((category) => (
+      <option key={category._id} value={category._id}>{category.title}</option>
+    ))}
+  </select>
+  <S.CustomButton onClick={() => getProducts(searchTerm, filter, categoryFilter)}>Filtrar</S.CustomButton>
+</S.FilterContainer>
 
       <S.ContainerProducts>
         {products.map((item, i) => (
@@ -107,7 +170,7 @@ export default function Index() {
                         toDuplicate(item);
                         popupState.close();
                       }}>
-                        <span className="fa fa-copy"></span> 
+                        <span className="fa fa-copy"></span>
                         &#160;&#160;&#160;Duplicar
                       </MenuItem>
                       <MenuItem
@@ -116,7 +179,7 @@ export default function Index() {
                           popupState.close();
                         }}
                       >
-                        <span className="fa fa-remove"></span> 
+                        <span className="fa fa-remove"></span>
                         &#160;&#160;&#160;&#160;Excluir
                       </MenuItem>
                     </Menu>

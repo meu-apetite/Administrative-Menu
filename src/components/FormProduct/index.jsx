@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { FormControl, Grid, InputAdornment, InputLabel, OutlinedInput, TextField } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { FormControl, Grid, InputAdornment, InputLabel, MenuItem, OutlinedInput, TextField } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { ApiService } from 'services/api.service';
 import { propsTextField } from 'utils/form';
 import { units } from 'utils/units';
-import Select from 'components/Select';
+import Select from '@mui/material/Select';
 import imageDefault from 'assets/images/default-placeholder.png';
 import * as S from './style';
 
@@ -31,51 +31,58 @@ const FormProduct = (props) => {
     if (e.target.files.length <= 0) return;
     setImageCurrent(URL.createObjectURL(e.target.files[0]));
     setData({ ...data, images: [e.target.files[0]] });
+    props.getData({ ...data, images: [e.target.files[0]] });
   };
 
   const removeImage = () => {
     setData({ ...data, images: [] });
     setImageCurrent(null);
-  }
+  };
 
   const getCategories = async () => {
     try {
       const response = await apiService.get('/admin/categories');
-      const data = response.data;
-      setCategories(data.map((item) => ({ text: item.title, value: item._id })));
-      if (state?.categoryId) {
-        const find = data.findIndex(item => item._id === state.categoryId);
-        if (find >= 0) setData({ ...data, category: state.categoryId });
-      }
-    } catch (e) { }
+      setCategories(response.data);
+    } catch (e) {}
   };
 
   const maskFormat = (data) => {
     const numericString = data.replace(/[^\d]/g, '');
-    const number = parseFloat(numericString); 
+    const number = parseFloat(numericString);
     if (isNaN(number)) return '0.00';
     return (number / 100).toFixed(2);
   };
 
-  useEffect(() => {
-    getCategories();
-    setData(props.initialData);
-    setImageCurrent(props.initialData.images[0])
-  }, []);
+  const handleInputChange = (fieldName, value) => {
+    setData((prevData) => {
+      const newData = { ...prevData, [fieldName]: value };
+      return newData;
+    });
+    props.getData({ ...data, [fieldName]: value })
+  };
   
   useEffect(() => {
-    props.getData(data);
-  }, [data]);
+    getCategories();
+    
+    if(props?.data?.images?.[0]) {
+      setImageCurrent(props.data.images[0]);
+    } else if(props?.data?.images?.[0]) {
+      setImageCurrent(URL.createObjectURL(props.data.images[0]));
+    }
+
+    const category = state?.categoryId || props.data?.category || '';
+    setData({ ...props.data, category });
+  }, []);
 
   return (
     <Grid container spacing={2} sx={{ mt: '1rem' }}>
       <S.wrapperIntro>
         <S.WrapperUpload>
-          {(data.images?.length >= 1) 
-            && <span className="fa fa-close close" onClick={removeImage}></span>
-          }
+          {data?.images?.length >= 1 && (
+            <span className="fa fa-close close" onClick={removeImage}></span>
+          )}
           <label>
-            {(!imageCurrent) && <button>clique aqui para add imagem</button>}
+            {!imageCurrent && <button>clique aqui para add imagem</button>}
             <input accept="image/*" onChange={loadImage} type="file" />
             <S.ImageProduct src={imageCurrent || imageDefault} />
           </label>
@@ -86,7 +93,7 @@ const FormProduct = (props) => {
             label="Nome"
             required={true}
             value={data.name}
-            onChange={(e) => setData({ ...data, name: e.target.value })}
+            onChange={(e) => handleInputChange('name', e.target.value)}
           />
           <TextField
             {...propsTextField}
@@ -94,7 +101,7 @@ const FormProduct = (props) => {
             multiline
             rows={3}
             value={data.description}
-            onChange={(e) => setData({ ...data, description: e.target.value })}
+            onChange={(e) => handleInputChange('description', e.target.value)}
           />
         </Grid>
       </S.wrapperIntro>
@@ -103,27 +110,34 @@ const FormProduct = (props) => {
           label="Código"
           value={data.code}
           fullWidth={true}
-          onChange={(e) => setData({ ...data, code: e.target.value })}
+          onChange={(e) => handleInputChange('code', e.target.value)}
         />
       </Grid>
+
       <Grid item xs={6} sx={{ display: 'flex', alignItems: 'end', mb: '4px' }}>
-        <Select
-          data={[{ text: 'Ativo', value: true }, { text: 'Desativo', value: false }]}
-          label="Status"
-          value={data.status}
-          onChange={(e) => setData({ ...data, status: e.target.value })}
-        />
+        <FormControl sx={{ width: '100%' }}>
+          <InputLabel id="status">Status</InputLabel>
+          <Select
+            labelId="status"
+            value={data.status}
+            onChange={(e) => handleInputChange('status', e.target.value)}
+            label="Status"
+            fullWidth
+          >
+            <MenuItem value={true}>Ativo</MenuItem>
+            <MenuItem value={false}>Desativo</MenuItem>
+          </Select>
+        </FormControl>
       </Grid>
+
       <Grid item xs={6} sx={{ display: 'flex', alignItems: 'end', mb: '4px', mt: '10px' }}>
-         <FormControl fullWidth>
+        <FormControl fullWidth>
           <InputLabel>Preço</InputLabel>
           <OutlinedInput
             startAdornment={<InputAdornment position="start">R$</InputAdornment>}
             label="Preço"
             value={data.price}
-            onChange={(e) => {
-              setData({ ...data, price: maskFormat(e.target.value) });
-            }}
+            onChange={(e) => handleInputChange('price', maskFormat(e.target.value))}
           />
         </FormControl>
       </Grid>
@@ -134,28 +148,49 @@ const FormProduct = (props) => {
             startAdornment={<InputAdornment position="start">R$</InputAdornment>}
             label="Preço com desconto"
             value={data.discountPrice}
-            onChange={(e) => {
-              setData({ ...data, discountPrice: maskFormat(e.target.value) });
-            }}
+            onChange={(e) =>
+              handleInputChange('discountPrice', maskFormat(e.target.value))
+            }
           />
         </FormControl>
       </Grid>
+
       <Grid item xs={12} sx={{ mt: 1.1 }}>
-        <Select
-          value={data.unit}
-          data={units}
-          label="Unidade de medida"
-          onChange={(e) => setData({ ...data, unit: e.target.value })}
-        />
+        <FormControl sx={{ width: '100%' }}>
+          <InputLabel id="unit">Unidade de medida</InputLabel>
+          <Select
+            labelId="unit"
+            value={data.unit}
+            onChange={(e) => handleInputChange('unit', e.target.value)}
+            label="Unidade de medida"
+            fullWidth
+          >
+            {units?.map((u) => (
+              <MenuItem key={u.value} value={u.value}>
+                {u.text}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
+
       <Grid item xs={12} sx={{ mt: 1.1, mb: 1.1 }}>
-        
-        <Select
-          value={data.category}
-          data={categories}
-          label="Categoria *"
-          onChange={(e) => setData({ ...data, category: e.target.value })}
-        />
+        <FormControl sx={{ width: '100%' }}>
+          <InputLabel id="category">Categoria</InputLabel>
+          <Select
+            labelId="category"
+            value={data.category}
+            onChange={(e) => handleInputChange('category', e.target.value)}
+            label="Categoria"
+            fullWidth
+          >
+            {categories?.map((c) => (
+              <MenuItem key={c._id} value={c._id}>
+                {c.title}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
     </Grid>
   );
