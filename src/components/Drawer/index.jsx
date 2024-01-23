@@ -1,62 +1,70 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
-  ListItem, 
-  Divider, 
-  List, 
-  Toolbar, 
-  Box, 
+import {
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListItem,
+  Divider,
+  List,
+  Toolbar,
+  Box,
   IconButton,
-  Button
+  MenuList,
+  MenuItem,
+  Paper
 } from '@mui/material';
-import menuItems from './items';
 import { Avatar, CardHeader, styled } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
+import { menuItems } from './items';
 import * as S from './style';
 
 const MiniDrawer = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [openMenuProfile, setOpenMenuProfile] = useState(false);
   const [routeActive, setRouteActive] = useState('home');
   const { company, changeTheme, themeMode } = useContext(AuthContext);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-    // button-float
-  };
+  const handleDrawerOpen = () => setOpen(true);
 
   const handleDrawerClose = () => setOpen(false);
 
   const toLink = (link) => {
-    if (link === 'logout') {
-      localStorage.removeItem('_id');
-      localStorage.removeItem('token');
-      return window.location.reload();
-    }
     if (window.innerWidth <= 900) handleDrawerClose();
-    setRouteActive(link)
+    setRouteActive(link);
     navigate(link);
   };
 
-  const CustomCardHeader = styled(CardHeader)`
-    && .css-1ssile9-MuiCardHeader-avatar { margin: 0 }
-  `;
+  const toggleoMenuProfile = () => setOpenMenuProfile(!openMenuProfile);
+
+  const menuItemsProfile = [
+    { label: 'Visitar cardápio', iconClass: 'fa-eye' },
+    { label: 'Termos de uso e privacidade', iconClass: 'fa-file-alt' },
+    {
+      label: 'Sair', iconClass: 'fa-sign-out-alt', action: () => {
+        localStorage.removeItem('_id');
+        localStorage.removeItem('token');
+        return window.location.reload();
+      }
+    },
+  ];
+
+  const CustomCardHeader = styled(CardHeader)`&& .css-1ssile9-MuiCardHeader-avatar { margin: 0 }`;
+
+  useEffect(() => {
+    const currentRoute = window.location.pathname.split('/');
+    setRouteActive('/' + currentRoute[1]);
+  }, []);
 
   return (
-    <Box
-      sx={{ 
-        display: 'flex', [theme.breakpoints.down('md')]: { position: 'absolute' } 
-      }}
-    >
+    <S.Container>
       <CssBaseline />
       <S.AppBar open={open} position="fixed" sx={{ height: "65px" }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
@@ -70,48 +78,60 @@ const MiniDrawer = () => {
             <MenuIcon />
           </IconButton>
 
-          <S.WrapperIntro>
+          <S.WrapperIntro onClick={toggleoMenuProfile}>
             <CustomCardHeader
               sx={{ flexDirection: "row-reverse", gap: 1, pr: 0, m: 0 }}
               avatar={<Avatar src={company.custom.logo?.url} />}
               title={company.fantasyName}
             />
+            <span className="fas fa-angle-down"></span>
           </S.WrapperIntro>
         </Toolbar>
+
+        {openMenuProfile &&
+          <Paper sx={{ maxWidth: '250px', position: 'absolute', right: 0, top: '65px' }}>
+            <MenuList>
+              {menuItemsProfile.map((item, index) => (
+                <MenuItem onClick={item.action} key={index} sx={{ gap: '8px', wordWrap: 'break-word' }}>
+                  <span className={`fa ${item.iconClass}`} /> {item.label}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Paper>
+        }
       </S.AppBar>
 
       <S.Drawer variant="permanent" open={open}>
         <S.DrawerHeader>
-          <Button
+          <S.ButtonToggle
+            themeMode={themeMode}
             onClick={() => changeTheme(themeMode === 'dark' ? 'light' : 'dark')}
             startIcon={<i className="fa-solid fa-circle-half-stroke"></i>}
-            sx={{ 
-              color: themeMode === 'dark' ? '#fff' : '#092635',
-              borderColor: themeMode === 'dark' ? '#fff' : '#092635',
-              display: 'flex',
-              gap: '0.7rem',
-              pl: '6px'
-            }}
           >
-            Modo {themeMode === 'dark' ? 'light' : 'dark'} 
-          </Button>
+            Modo {themeMode === 'dark' ? 'light' : 'dark'}
+          </S.ButtonToggle>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </IconButton>
         </S.DrawerHeader>
 
-        {menuItems.map((group, menuIndex) => (
-          <Box key={menuIndex}>
-            <Divider key={menuIndex} />
+        {menuItems.map((category, categoryIndex) => (
+          <Box key={categoryIndex}>
+            <Divider key={categoryIndex} />
             <List sx={{ p: 0 }}>
-              {group.map((item, index) => (
-                <ListItem 
-                  key={index} 
-                  disablePadding 
-                  sx={{ 
-                    display: 'block', 
-                    background: item.link === routeActive ? 'rgba(0, 0, 0, 0.04)' : '' 
-                  }} 
+              {open &&
+                <ListItem sx={{ display: 'block', justifyContent: open ? 'initial' : 'center', px: 2.5 }}>
+                  <small style={{ fontWeight: 'bold' }}>
+                    {category.category}
+                  </small>
+                </ListItem>
+              }
+
+              {category.items.map((item, index) => (
+                <S.MenuItem
+                  key={index}
+                  disablePadding
+                  className={routeActive === item.link ? 'active-item' : ''}
                   onClick={() => toLink(item.link)}
                 >
                   <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5 }}>
@@ -120,13 +140,13 @@ const MiniDrawer = () => {
                     </ListItemIcon>
                     <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
                   </ListItemButton>
-                </ListItem>
+                </S.MenuItem>
               ))}
             </List>
           </Box>
         ))}
       </S.Drawer>
-    </Box>
+    </S.Container>
   );
 };
 

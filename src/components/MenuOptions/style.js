@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import { Button, ListItem } from '@mui/material';
+import { ListItem } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 
@@ -111,12 +111,4 @@ export const MenuItem = styled(ListItem)(({ theme }) => ({
       marginLeft: '-4px'
     }
   }
-}));
-
-export const ButtonToggle = styled(Button)(({ theme, themeMode }) => ({
-  color: themeMode === 'dark' ? '#fff' : '#092635',
-  borderColor: themeMode === 'dark' ? '#fff' : '#092635',
-  display: 'flex',
-  gap: '0.7rem',
-  pl: '6px',
 }));
