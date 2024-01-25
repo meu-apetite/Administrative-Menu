@@ -64,10 +64,10 @@ const FormProduct = (props) => {
   useEffect(() => {
     getCategories();
     
-    if(props?.data?.images?.[0]) {
-      setImageCurrent(props.data.images[0]);
-    } else if(props?.data?.images?.[0]) {
+    if (props?.data?.images?.[0] instanceof File) {
       setImageCurrent(URL.createObjectURL(props.data.images[0]));
+    } else if(props?.data?.images?.[0]) {
+      setImageCurrent(props.data.images[0]);
     }
 
     const category = state?.categoryId || props.data?.category || '';
