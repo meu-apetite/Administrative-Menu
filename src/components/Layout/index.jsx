@@ -33,9 +33,9 @@ const Layout = (props) => {
 
   return (
     <ThemeProvider theme={
-      themeMode === 'light' 
-        ? theme(company.custom.colorPrimary, company.custom.colorSecondary)
-        : themeDark(company.custom.colorPrimary, company.custom.colorSecondary)
+      themeMode === 'dark' 
+        ? themeDark(company.custom.colorPrimary, company.custom.colorSecondary)
+        : theme(company.custom.colorPrimary, company.custom.colorSecondary)
       }
     >
       <Box sx={{ display: 'flex', maxWidth: '1300px', margin: 'auto' }}>
