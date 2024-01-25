@@ -65,7 +65,6 @@ const Create = () => {
     
       setComplements(newComplements);
     }
-         
 
     try {
       const formData = new FormData();
@@ -74,7 +73,7 @@ const Create = () => {
       formData.append('code', data.code || '');
       formData.append('price', data.price);
       formData.append('discountPrice', data.discountPrice);
-      formData.append('isActive', data.status);
+      formData.append('isActive', typeof data.status === 'boolean' ? data.status : true );
       formData.append('category', data.category);
       formData.append('unit', data.unit);
       formData.append('images', data.images[0]);
@@ -86,7 +85,6 @@ const Create = () => {
       await apiService.post('/admin/products', formData, true);
 
       toast.success('Produto cadastrado');
-      return
       setTimeout(() => navigate({ pathname: '/products' }), 700);
     } catch (e) {
       toast.error(e.response?.data?.message || 'Erro ao cadastrar produto');
