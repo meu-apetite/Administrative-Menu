@@ -2,7 +2,6 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/admin",
   "dependencies": {
     "@mercadopago/sdk-react": "^0.0.14",
     "@mui/icons-material": "^5.10.3",
