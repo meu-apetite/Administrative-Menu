@@ -98,7 +98,7 @@ export const Logo = styled('img')(({ theme }) => ({
 export const WrapperIntro = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.5rem',
+  gap: '8px',
   textTransform: 'capitalize',
   '#button-down': {
     cursor: 'pointer'
