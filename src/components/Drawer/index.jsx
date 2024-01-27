@@ -128,8 +128,8 @@ const MiniDrawer = () => {
 
           <S.WrapperIntro onClick={toggleoMenuProfile}>
             <CustomCardHeader
-              sx={{ flexDirection: "row-reverse", gap: '8px', pr: 0, m: '0 !important' }}
-              avatar={<Avatar src={company.custom.logo?.url} />}
+              sx={{ flexDirection: "row-reverse", gap: '8px', pr: 0, m: 0 }}
+              avatar={<Avatar sx={{  m: 0 }} src={company.custom.logo?.url} />}
               title={company.fantasyName}
             />
             <span id="button-down" className="fas fa-angle-down"></span>
