@@ -84,16 +84,15 @@ const MiniDrawer = () => {
 
       if (buttonFloat && appMain && isWidthGreaterThan900 && open) {
         if (open) {
-          buttonFloat.style.left = `calc(50% + ${((240 / window.innerWidth) * 100)}% - ${buttonFloat.clientWidth / 1.2}px)`;
-          buttonFloat.style.transform = 'initial';
+          buttonFloat?.style?.left = `calc(50% + ${((240 / window.innerWidth) * 100)}% - ${buttonFloat.clientWidth / 1.2}px)`;
+          buttonFloat?.style?.transform = 'initial';
         } else {
-          buttonFloat.style.transform = 'translateX(-50%)';
-          buttonFloat.style.left = '50%';
+          buttonFloat?.style?.transform = 'translateX(-50%)';
+          buttonFloat?.style?.left = '50%';
         }
       } else if ((buttonFloat && appMain) || isWidthGreaterThan900 === false) {
-        console.log('ok');
-        buttonFloat.style.transform = 'translateX(-50%)';
-        buttonFloat.style.left = '50%';
+        buttonFloat?.style?.transform = 'translateX(-50%)';
+        buttonFloat?.style?.left = '50%';
       }
     };
 
