@@ -87,7 +87,7 @@ const Create = () => {
                 border: '2px solid',
               }}
             />
-            <S.ButtonChangeLogo component="label" variant="outlined">
+            <S.ButtonChangeLogo component="label" variant="outlined" color="info">
               <S.VisuallyHiddenInput type="file" onChange={(e) => updateLogo(e)} />
               Mudar logo
             </S.ButtonChangeLogo>

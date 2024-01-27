@@ -16,11 +16,11 @@ const Payment_Pix = () => {
       setLoading('Atualizando...');
 
       if (
-        company.settingsPayment.pix.active === data.active 
-        && company.settingsPayment.pix.name === data.name 
-        && company.settingsPayment.pix.city === data.city 
-        && company.settingsPayment.pix.key === data.key 
-        && company.settingsPayment.pix.keyType === data.keyType 
+        company.settingsPayment.pix.active === data.active
+        && company.settingsPayment.pix.name === data.name
+        && company.settingsPayment.pix.city === data.city
+        && company.settingsPayment.pix.key === data.key
+        && company.settingsPayment.pix.keyType === data.keyType
       ) return toast.error('Nenhuma alteração a ser feita');
 
       if (data.active) {
@@ -81,18 +81,19 @@ const Payment_Pix = () => {
 
   return (
     <section style={{ marginBottom: '48px' }}>
-      <p>Oferecemos pagamento online pelo Pix, o cliente</p>
+      <p>
+Seus clientes podem comprar via PIX, recebendo um QR code com as informações da sua conta abaixo. Você é responsável pela verificação do pagamento.</p>
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <FormControlLabel
             control={
               <Switch
-                value={data.active}
+                checked={data.active}
                 onChange={(e) => setData({ ...data, active: e.target.checked })}
               />
             }
-            label="Pagamento por PIX"
+            label={"Pagamento por PIX"}
           />
         </Grid>
 

@@ -41,7 +41,7 @@ const Layout = (props) => {
       <Box sx={{ display: 'flex', maxWidth: '1300px', margin: 'auto' }}>
         <Drawer />
 
-        <Box component="main" sx={{ flexGrow: 1, p: 2, mt: '64px' }}>
+        <Box component="main" id="app-main" sx={{ flexGrow: 1, p: 2, mt: '64px', position: 'relative' }}>
           <Box
             component={props.component}
             onSubmit={props.handleSubmit}

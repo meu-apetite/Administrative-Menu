@@ -29,6 +29,7 @@ const Address = () => {
     try {
       setLoading('Atualizando endereço');
       const { data } = await apiService.put('/admin/company/address', address);
+      console.log(data)
       setCompany({ ...company, address: data });
       setData(data);
       toast.success('Endereço atualizado');

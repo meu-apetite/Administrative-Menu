@@ -13,7 +13,4 @@ export const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-export const ButtonChangeLogo = styled(Button)(({ theme }) => ({
-  color: '#000',
-  borderColor: '#000',
-}));
+export const ButtonChangeLogo = styled(Button)(({ theme }) => ({ }));

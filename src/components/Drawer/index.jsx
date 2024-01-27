@@ -30,6 +30,7 @@ const MiniDrawer = () => {
   const [open, setOpen] = useState(false);
   const [openMenuProfile, setOpenMenuProfile] = useState(false);
   const [routeActive, setRouteActive] = useState('home');
+  const [currentLeft, setCurrentLeft] = useState('home');
   const { company, changeTheme, themeMode } = useContext(AuthContext);
 
   const handleDrawerOpen = () => setOpen(true);
@@ -45,10 +46,26 @@ const MiniDrawer = () => {
   const toggleoMenuProfile = () => setOpenMenuProfile(!openMenuProfile);
 
   const menuItemsProfile = [
-    { label: 'Visitar cardápio', iconClass: 'fa-eye' },
-    { label: 'Termos de uso e privacidade', iconClass: 'fa-file-alt' },
     {
-      label: 'Sair', iconClass: 'fa-sign-out-alt', action: () => {
+      label: 'Visitar cardápio',
+      iconClass: 'fa-eye',
+      action: () => {
+        window.open(`https://meuapetite.com/${company.storeUrl}`, '_blank');
+        setOpenMenuProfile(false);
+      }
+    },
+    {
+      label: 'Termos de uso e privacidade',
+      iconClass: 'fa-file-alt',
+      action: () => {
+        navigate('terms');
+        setOpenMenuProfile(false);
+      }
+    },
+    {
+      label: 'Sair',
+      iconClass: 'fa-sign-out-alt',
+      action: () => {
         localStorage.removeItem('_id');
         localStorage.removeItem('token');
         return window.location.reload();
@@ -57,6 +74,37 @@ const MiniDrawer = () => {
   ];
 
   const CustomCardHeader = styled(CardHeader)`&& .css-1ssile9-MuiCardHeader-avatar { margin: 0 }`;
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isWidthGreaterThan900 = window.innerWidth > 899;
+      const appMain = document.querySelector('#app-main');
+      const buttonFloat = document.querySelector('#button-float');
+      console.log(isWidthGreaterThan900);
+
+      if (buttonFloat && appMain && isWidthGreaterThan900 && open) {
+        if (open) {
+          buttonFloat.style.left = `calc(50% + ${((240 / window.innerWidth) * 100)}% - ${buttonFloat.clientWidth / 1.2}px)`;
+          buttonFloat.style.transform = 'initial';
+        } else {
+          buttonFloat.style.transform = 'translateX(-50%)';
+          buttonFloat.style.left = '50%';
+        }
+      } else if ((buttonFloat && appMain) || isWidthGreaterThan900 === false) {
+        console.log('ok');
+        buttonFloat.style.transform = 'translateX(-50%)';
+        buttonFloat.style.left = '50%';
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [open]);
+
 
   useEffect(() => {
     const currentRoute = window.location.pathname.split('/');
@@ -80,11 +128,11 @@ const MiniDrawer = () => {
 
           <S.WrapperIntro onClick={toggleoMenuProfile}>
             <CustomCardHeader
-              sx={{ flexDirection: "row-reverse", gap: 1, pr: 0, m: 0 }}
+              sx={{ flexDirection: "row-reverse", gap: '8px', pr: 0, m: 0 }}
               avatar={<Avatar src={company.custom.logo?.url} />}
               title={company.fantasyName}
             />
-            <span className="fas fa-angle-down"></span>
+            <span id="button-down" className="fas fa-angle-down"></span>
           </S.WrapperIntro>
         </Toolbar>
 

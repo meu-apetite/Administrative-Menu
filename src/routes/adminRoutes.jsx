@@ -19,7 +19,7 @@ import Settings_InfoContact from 'pages/Settings/Settings_InfoContact';
 import Settings_InfoAdmin from 'pages/Settings/Settings_InfoAdmin';
 import Payment_InDelivery from 'pages/PaymentMethod/Payment_InDelivery';
 import Financial from 'pages/Financial/Index';
-
+import Terms from 'pages/Terms';
 
 const adminRoutes = [
   {
@@ -66,6 +66,8 @@ const adminRoutes = [
       },
 
       { path: '*', element: <Navigate to="/" /> },
+
+      { path: 'terms', element: <Terms /> }
     ],
   },
 ];

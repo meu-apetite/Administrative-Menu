@@ -99,7 +99,10 @@ export const WrapperIntro = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: '0.5rem',
-  textTransform: 'capitalize'
+  textTransform: 'capitalize',
+  '#button-down': {
+    cursor: 'pointer'
+  }
 }));
 
 export const MenuItem = styled(ListItem)(({ theme }) => ({

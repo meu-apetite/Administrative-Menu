@@ -26,6 +26,7 @@ const Register = () => {
   const navigate = useNavigate();
   const { toast } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
+  const [terms, setTerms] = useState(false);
   const [data, setData] = useState({
     email: '',
     password: '',
@@ -58,7 +59,7 @@ const Register = () => {
     try {
       if (
         !data.email || !data.password || !data.passwordRepeat ||
-        !data.fantasyName || !data.ownerName || !data.storeUrl || 
+        !data.fantasyName || !data.ownerName || !data.storeUrl ||
         !data.whatsapp
       ) {
         return toast.error('Todos os campos precisam serem preencidos!');
@@ -68,7 +69,11 @@ const Register = () => {
         return toast.error('As senhas não correspondem');
       }
 
-      setLoading('Fazendo cadastro...')
+      if (!terms) {
+        return toast.error('Você deve aceitar os termos para prosseguir');
+      }
+
+      setLoading('Fazendo cadastro...');
 
       const response = await apiService.post('/auth/register', data);
 
@@ -139,10 +144,10 @@ const Register = () => {
                   label="Link personalizado"
                   value={data.storeUrl}
                   InputProps={{
-                    startAdornment: 
-                    <InputAdornment position="start" sx={{ color: '#ff7f32' }}>
-                      {'https://meuapetite.com'}/
-                    </InputAdornment>
+                    startAdornment:
+                      <InputAdornment position="start" sx={{ color: '#ff7f32' }}>
+                        {'https://meuapetite.com'}/
+                      </InputAdornment>
                   }}
                   onChange={(e) => setData({ ...data, storeUrl: e.target.value })}
                 />
@@ -186,15 +191,16 @@ const Register = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="Eu aceito todos os termos."
+                  control={<Checkbox value={terms} onChange={() => setTerms(true)} color="primary" />}
+                  label={<Link href="terms">Eu aceito todos os termos.</Link>}
                 />
               </Grid>
+
             </Grid>
 
-            <Button 
-              fullWidth 
-              variant="contained" 
+            <Button
+              fullWidth
+              variant="contained"
               sx={{ mt: 3, mb: 2 }}
               onClick={handleSubmit}
             >
