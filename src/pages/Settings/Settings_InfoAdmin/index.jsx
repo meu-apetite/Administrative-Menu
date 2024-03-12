@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Box, Grid, TextField } from '@mui/material';
 import { ApiService } from 'services/api.service';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import ButtonFloat from 'components/ButtonFloat';
 
 const Settings_InfoAdmin = () => {
   const apiService = new ApiService();
-  const { toast, setLoading, company, setCompany } = useContext(AuthContext);
+  const { toast, setLoading, company, setCompany } = useContext(GlobalContext);
   const [data, setData] = useState({ name: '', phoneNumber: '', email: '' });
 
   const save = async (e) => {

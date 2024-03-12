@@ -8,13 +8,13 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { ApiService } from 'services/api.service';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import Header from 'components/Header';
 import BackdropLoading from 'components/BackdropLoading';
 
 const Index = () => {
   const apiService = new ApiService();
-  const { toast } = useContext(AuthContext);
+  const { toast } = useContext(GlobalContext);
   const [loading, setLoading] = useState(false);
   const [dateRange, setDateRange] = useState('month');
   const [customStartDate, setCustomStartDate] = useState('');
@@ -32,13 +32,10 @@ const Index = () => {
 
   const getFinancialData = async () => {
     try {
-      setLoading(true);
+      setLoading('Buscando...');
 
-      let params = { dateRange };
 
-      if (dateRange === 'custom') params = { dateRange, customStartDate, customEndDate };
-
-      const response = await apiService.get('/admin/finance', { params });
+      const response = await apiService.post('/admin/finance', { period: dateRange });
 
       const formattedData = response.data.ordersBriefInfo.map(item => ({
         ...item, 
@@ -55,7 +52,6 @@ const Index = () => {
     }
   };
 
-
   useEffect(() => {
     getFinancialData();
   }, []);
@@ -69,36 +65,39 @@ const Index = () => {
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'client', headerName: 'Cliente', width: 200 },
     { field: 'date', headerName: 'Data', width: 180 },
+    { field: 'delivery', headerName: 'Entrega', width: 180 },
     { field: 'totalItems', headerName: 'Total Items', width: 150 },
     { field: 'totalValue', headerName: 'Valor Total', width: 150 },
   ];
 
   return (
     <Box>
-      <Header title="Financeiro" buttonText="Atualizar" />
+      <Header title="Pedidos concluídos" />
 
       <Grid container spacing={2}>
         <Grid item xs={6} sm={6}>
-          <Select value={dateRange} onChange={handleDateRangeChange} fullWidth>
+          <Select 
+            sx={{ height: '40px' }} 
+            value={dateRange} 
+            onChange={handleDateRangeChange} 
+            fullWidth
+          >
             <MenuItem value="all">Todos</MenuItem>
             <MenuItem value="day">Dia</MenuItem>
             <MenuItem value="week">Semana</MenuItem>
             <MenuItem value="month">Mês</MenuItem>
-            <MenuItem value="custom">Personalizado</MenuItem>
           </Select>
         </Grid>
 
         <Grid item xs={6} sm={6}>
-          <Button variant="contained" onClick={getFinancialData}>
+          <Button 
+            sx={{ height: '40px' }} 
+            variant="contained" 
+            onClick={getFinancialData}
+          >
             Buscar
           </Button>
         </Grid>
-
-        {dateRange === 'custom' && (
-          <Grid item xs={12} sm={6}>
-            {/* Add your custom date range components here */}
-          </Grid>
-        )}
       </Grid>
 
       <br />

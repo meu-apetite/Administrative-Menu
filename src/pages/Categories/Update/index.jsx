@@ -4,13 +4,13 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Header from 'components/Header';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 
 const Update = () => {  
   const { id } = useParams();
   const apiService = new ApiService();
-  const {setLoading, toast } = useContext(AuthContext);  
+  const {setLoading, toast } = useContext(GlobalContext);  
   const [category, setCategory] = useState({ title: '' });
 
   const handleSubmit = async (e) => {

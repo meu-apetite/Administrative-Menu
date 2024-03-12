@@ -4,7 +4,8 @@ import { styled } from '@mui/system';
 export const ContainerProducts = styled('main')({
   display: 'flex',
   flexDirection: 'column',
-  gap: 24
+  gap: 24,
+  marginTop: 32
 });
 
 export const ModalContainer = styled('div')({

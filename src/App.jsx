@@ -1,8 +1,9 @@
 import { useRoutes } from 'react-router-dom';
-import { AuthContext, AuthProvider } from 'contexts/auth';
+import { GlobalContext, GlobalProvider } from 'contexts/Global';
 import authRoutes from 'routes/authRoutes';
 import adminRoutes from 'routes/adminRoutes';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
+import BackdropLoading from 'components/BackdropLoading';
 
 const GlobalStyles = () => (
   <style>
@@ -18,8 +19,8 @@ const GlobalStyles = () => (
 );
 
 const Routes = () => {
-  const authContext = useContext(AuthContext);
-  const { authenticationStatus } = authContext;
+  const globalContext = useContext(GlobalContext);
+  const { authenticationStatus } = globalContext;
 
   const AuthRoutes = () => {
     const routes = useRoutes([...authRoutes]);
@@ -31,27 +32,23 @@ const Routes = () => {
     return <>{routes}</>;
   };
 
-  useEffect(() => { }, []);
-
   return (
-    <div>
-      {authenticationStatus === null ? (
-        <>Carregando</>
-      ) : (
-        authenticationStatus === 'logged' ? <AdminRoutes /> : <AuthRoutes />
-      )}
-    </div>
+    <>
+      {authenticationStatus === 'authenticating' 
+        && <BackdropLoading loading="Carregando" bgColor="#282a37" />
+      }
+      {authenticationStatus === 'authenticated' && <AdminRoutes />}
+      {authenticationStatus === 'unauthenticated' && <AuthRoutes />}
+    </>
   );
 };
 
 const App = () => {
   return (
-    <>
+    <GlobalProvider>
       <GlobalStyles />
-      <AuthProvider>
-        <Routes />
-      </AuthProvider>
-    </>
+      <Routes />
+    </GlobalProvider>
   );
 };
 

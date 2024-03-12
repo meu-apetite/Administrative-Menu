@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Box, Grid, TextField } from '@mui/material';
 import { ApiService } from 'services/api.service';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import ButtonFloat from 'components/ButtonFloat';
 import BackdropLoading from 'components/BackdropLoading';
 
 const Settings_InfoContact = () => {
   const apiService = new ApiService();
-  const { toast, company, setCompany } = useContext(AuthContext);
+  const { toast, company, setCompany } = useContext(GlobalContext);
   const [data, setData] = useState({ phoneNumber: '', email: '' });
   const [loading, setLoading] = useState(false);
 

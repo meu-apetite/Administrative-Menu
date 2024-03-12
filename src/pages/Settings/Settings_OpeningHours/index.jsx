@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { Grid, Typography, TextField } from '@mui/material';
-import { AuthContext } from 'contexts/auth/index.jsx';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 import ButtonFloat from 'components/ButtonFloat/index.jsx';
 import BackdropLoading from 'components/BackdropLoading';
@@ -8,7 +8,7 @@ import BackdropLoading from 'components/BackdropLoading';
 const Settings_OpeningHours = ({ openingHours, }) => {
   const apiService = new ApiService();
 
-  const { toast, company, setCompany } = useContext(AuthContext);
+  const { toast, company, setCompany } = useContext(GlobalContext);
 
   const listDayName = [
     { name: 'monday', label: 'Segunda' },

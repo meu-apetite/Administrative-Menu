@@ -1,16 +1,16 @@
 import { useContext, useEffect, useState } from 'react';
-import { Box, Button, Grid, TextField } from '@mui/material';
-import { AuthContext } from 'contexts/auth';
+import { Box, Grid, TextField } from '@mui/material';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 import Header from 'components/Header';
 import FindAddress from 'components/FindAddress';
 import { propsTextField } from 'utils/form';
-import * as S from './style.js';
+
 
 const Address = () => {
   const apiService = new ApiService();
 
-  const { toast, company, setCompany } = useContext(AuthContext);
+  const { toast, company, setCompany } = useContext(GlobalContext);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     city: '',

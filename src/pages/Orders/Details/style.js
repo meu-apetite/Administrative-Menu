@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardMedia, MenuItem, Paper } from '@mui/material';
+import { Card, CardContent, CardMedia, MenuItem, Paper } from '@mui/material';
 import { styled } from '@mui/system';
 
 export const ContainerProducts = styled('main')({
@@ -109,70 +109,10 @@ export const ProductInfo = styled(Paper)({
   gridTemplateColumns: '1fr 80px',
   justifyContent: 'space-between',
   'img': {
-    height: '100%',
-    width: '100%',
+    width: 90,
+    height: 90,
+    borderRadius: 4,
     maxWidth: '100px',
     objectFit: 'cover'
   }
-});
-
-export const SearchContainer = styled('div')(({ theme }) => ({
-  display: 'flex',
-  input: {
-    flex: 1,
-    padding: '8px',
-    marginRight: '8px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-  },
-  button: {
-    padding: '8px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-}));
-
-export const FilterContainer = styled('div')(({ theme }) => ({
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: '8px',
-  alignItems: 'end',
-  margin: `${theme.spacing(1)} 0 ${theme.spacing(5)}`,
-
-  '& > *': {
-    margin: 0,
-  },
-
-  label: {
-    fontSize: 'small'
-  },
-  input: {
-    padding: '8px',
-    marginRight: '8px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-  },
-  select: {
-    height: '35px',
-    padding: '8px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-  },
-  button: {
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-}));
-
-
-export const CustomButton = styled(Button)({
-  '&:hover': {
-    backgroundColor: 'rgba(0, 123, 255, 0.8)'
-  },
 });

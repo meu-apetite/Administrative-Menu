@@ -10,7 +10,7 @@ import {
   Tabs,
   TextField,
 } from '@mui/material';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 import Header from 'components/Header';
 import * as S from './style';
@@ -19,7 +19,7 @@ import BackdropLoading from 'components/BackdropLoading';
 
 const PaymentMethod = () => {
   const apiService = new ApiService();
-  const { toast, company } = useContext(AuthContext);
+  const { toast, company } = useContext(GlobalContext);
   const [listPaymentMethods, setListPaymentMethods] = useState([]);
   const [paymentsmethods, setPaymentsmethods] = useState([]);
   const [tabValue, setTabValue] = useState('delivery');

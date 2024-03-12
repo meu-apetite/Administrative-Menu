@@ -6,7 +6,7 @@ const BackdropLoading = (props) => {
       sx={{
         color: '#000000',
         zIndex: (theme) => theme.zIndex.drawer + 100,
-        backgroundColor: 'rgb(0 0 0 / 70%)'
+        backgroundColor: props?.bgColor ?? 'rgb(0 0 0 / 70%)'
       }}
       open={typeof props.loading === 'string' ? true : props.loading}
     >

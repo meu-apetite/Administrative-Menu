@@ -16,13 +16,14 @@ import {
 } from '@mui/material';
 import ImageIntro from 'assets/images/intro-login.webp';
 import { ApiService } from 'services/api.service';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import BackdropLoading from 'components/BackdropLoading';
 import * as S from './style';
 
+
 export default function Login() {
   const apiService = new ApiService(false);
-  const { toast } = useContext(AuthContext);
+  const { toast } = useContext(GlobalContext);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({ email: '', password: '' });
 

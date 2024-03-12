@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { FormControlLabel, Switch } from '@mui/material';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 import BackdropLoading from 'components/BackdropLoading';
 import ButtonFloat from 'components/ButtonFloat';
@@ -8,7 +8,7 @@ import * as S from './style';
 
 const Payment_InDelivery = () => {
   const apiService = new ApiService();
-  const { toast, company } = useContext(AuthContext);
+  const { toast, company } = useContext(GlobalContext);
   const [listPaymentMethods, setListPaymentMethods] = useState([]);
   const [paymentsmethods, setPaymentsmethods] = useState([]);
   const [hasUpdate, setHasUpdate] = useState(false);

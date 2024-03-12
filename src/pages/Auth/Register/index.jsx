@@ -13,24 +13,21 @@ import {
   FormControlLabel,
   Typography,
   Container,
-  Modal,
-  DialogContent,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { ThemeProvider } from '@mui/material/styles';
 import { ApiService } from 'services/api.service';
-import { AuthContext } from 'contexts/auth';
-import * as S from './style';
+import { GlobalContext } from 'contexts/Global';
 import BackdropLoading from 'components/BackdropLoading';
-import Terms from 'pages/Terms';
+import * as S from './style';
+
 
 const Register = () => {
   const apiService = new ApiService(false);
   const navigate = useNavigate();
-  const { toast } = useContext(AuthContext);
+  const { toast } = useContext(GlobalContext);
   const [loading, setLoading] = useState(false);
   const [terms, setTerms] = useState(false);
-  const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [data, setData] = useState({
     email: '',
     password: '',

@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import { Button, ListItem } from '@mui/material';
+import { Button, ListItem, ListItemButton, Paper } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 
@@ -79,6 +79,20 @@ export const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',
+  '.MuiDrawer-paperAnchorDockedLeft': {
+    '::-webkit-scrollbar': {
+      width: '5px'
+    },              
+    '::-webkit-scrollbar-track': {
+      background: '#f1f1f1' 
+    },               
+    '::-webkit-scrollbar-thumb': {
+      background: '#888'
+    },              
+    '::-webkit-scrollbar-thumb:hover': {
+      background:'#555' 
+    },
+  },
   ...(open && {
     ...openedMixin(theme),
     '& .MuiDrawer-paper': openedMixin(theme),
@@ -105,21 +119,34 @@ export const WrapperIntro = styled('div')(({ theme }) => ({
   }
 }));
 
-export const MenuItem = styled(ListItem)(({ theme }) => ({
+export const MenuItem = styled(ListItem)(({ theme, open }) => ({
   display: 'block',
   '&.active-item': {
     background: 'rgba(0, 0, 0, 0.04)',
     borderLeft: `4px solid ${theme.palette.secondary.main}`,
     '[role="button"]': {
-      marginLeft: '-4px'
+      marginLeft: open ? '-18px' : '-6' 
     }
   }
 }));
 
-export const ButtonToggle = styled(Button)(({ theme, themeMode }) => ({
-  color: themeMode === 'dark' ? '#fff' : '#092635',
-  borderColor: themeMode === 'dark' ? '#fff' : '#092635',
+export const ButtonToggle = styled(Button)(({ theme, thememode }) => ({
+  color: thememode === 'dark' ? '#fff' : '#092635',
+  borderColor: thememode === 'dark' ? '#fff' : '#092635',
   display: 'flex',
   gap: '0.7rem',
   pl: '6px',
+}));
+
+export const ListItemButtonCustom = styled(ListItemButton)(({ theme, open }) => ({
+  minHeight: 48,
+  justifyContent: open ? 'initial' : 'center', 
+  marginLeft: open ? -16 : 0
+}));
+
+export const PaperMenuCustom = styled(Paper)(({ theme }) => ({
+maxWidth: '250px', 
+position: 'absolute', 
+right: 0, 
+top: '65px', 
 }));

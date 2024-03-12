@@ -2,11 +2,11 @@ import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Stepper, Step, StepLabel, Button, Typography, Container, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { ApiService } from 'services/api.service';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import ButtonFloat from 'components/ButtonFloat';
 
 const StepperCompany = () => {
-  const { company, setCompany, toast } = useContext(AuthContext);
+  const { company, setCompany, toast } = useContext(GlobalContext);
   const [activeStep, setActiveStep] = useState(0);
 
   const Step1 = () => {

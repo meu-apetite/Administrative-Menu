@@ -1,50 +1,68 @@
 import React, { useState, useEffect, useContext } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useNavigate } from 'react-router-dom';
-import { Button, Pagination, Box, MenuItem, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Typography } from '@mui/material';
+import { Button, Pagination, Box, MenuItem, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Menu } from '@mui/material';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { ApiService } from 'services/api.service';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import Header from 'components/Header';
-import Menu from '@mui/material/Menu';
 import BackdropLoading from 'components/BackdropLoading';
+import Filter from 'components/Filter';
 import * as S from './style';
 
-export default function Index() {
+
+const filters = [
+  {
+    name: 'searchTerm',
+    label: 'Buscar por produto',
+    placeholder: 'Buscar produtos...',
+    type: 'text'
+  },  
+  {
+    name: 'status',
+    label: 'Status',
+    placeholder: 'Todos',
+    type: 'select',
+    options: [
+      { value: true, label: 'Ativo' }, 
+      { value: false, label: 'Inativo' }, 
+    ]
+  }
+];
+
+const Index = () => {
   const apiService = new ApiService();
   const navigate = useNavigate();
-  const { toast, company } = useContext(AuthContext);
+  const { toast, company } = useContext(GlobalContext);
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('');
   const [categories, setCategories] = useState([]);
-  const [categoryFilter, setCategoryFilter] = useState(''); 
 
-  const getProducts = async (search, filter, filterCategory) => {
+  const getProducts = async () => {
     try {
       setLoading('Carregando...');
-  
+
       let url = `/admin/products?page=1`;
-  
-      if (search) {
-        url += `&search=${encodeURIComponent(search)}`;
+
+      if (filter.status) {
+        url += `&status=${encodeURIComponent(filter.status)}`;
       }
-  
-      if (filter) {
-        url += `&filter=${encodeURIComponent(filter)}`;
+
+      if (filter.searchTerm) {
+        url += `&search=${encodeURIComponent(filter.searchTerm)}`;
       }
-  
-      if (filterCategory) {
-        url += `&filterCategory=${encodeURIComponent(filterCategory)}`;
+
+      if (filter.category) {
+        url += `&filterCategory=${encodeURIComponent(filter.category)}`;
       }
-  
+
       const { data } = await apiService.get(url);
-  
+
       setProducts(data.products);
       setTotalPages(data.totalPages);
       setPage(data.page);
@@ -56,7 +74,7 @@ export default function Index() {
       setLoading(null);
     }
   };
-  
+
   const changePage = async (e, value) => {
     try {
       setLoading('Carregando...');
@@ -67,7 +85,6 @@ export default function Index() {
       setPage(data.page);
       window.scrollTo(0, 0);
     } catch (error) {
-      console.log(error);
       toast.error('Não foi possível mudar de página');
     } finally {
       setLoading(null);
@@ -108,11 +125,16 @@ export default function Index() {
     try {
       const response = await apiService.get('/admin/categories');
       setCategories(response.data);
-    } catch (e) {}
+    } catch (e) { }
   };
+
+  const getFilters = async (filter) => setFilter(filter);
 
   useEffect(() => {
     getProducts();
+  }, [filter]);
+
+  useEffect(() => {
     getCategories();
   }, []);
 
@@ -125,30 +147,21 @@ export default function Index() {
         back={-1}
       />
 
-<S.SearchContainer>
-  <input
-    type="text"
-    placeholder="Buscar produtos..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-  />
-  <S.CustomButton onClick={() => getProducts(searchTerm, filter)}>Buscar</S.CustomButton>
-</S.SearchContainer>
-
-<S.FilterContainer>
-  <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-    <option value="">Todos</option>
-    <option value="ativo">Ativos</option>
-    <option value="inativo">Inativos</option>
-  </select>
-  <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-    <option value="">Todas Categorias</option>
-    {categories.map((category) => (
-      <option key={category._id} value={category._id}>{category.title}</option>
-    ))}
-  </select>
-  <S.CustomButton onClick={() => getProducts(searchTerm, filter, categoryFilter)}>Filtrar</S.CustomButton>
-</S.FilterContainer>
+      <Filter
+        filters={[
+          ...filters,
+          {
+            name: 'category',
+            label: 'Categoria',
+            placeholder: 'Todas categoria',
+            type: 'select',
+            options: categories.map(item => 
+              ({ value: item._id, label: item.title })
+            )
+          }
+        ]}
+        onApplyFilters={getFilters}
+      />
 
       <S.ContainerProducts>
         {products.map((item, i) => (
@@ -165,10 +178,7 @@ export default function Index() {
                         <span className="fa fa-edit"></span>
                         &#160;&#160;&#160;Editar
                       </MenuItem>
-                      <MenuItem onClick={() => {
-                        toDuplicate(item);
-                        popupState.close();
-                      }}>
+                      <MenuItem onClick={() => toDuplicate(item)}>
                         <span className="fa fa-copy"></span>
                         &#160;&#160;&#160;Duplicar
                       </MenuItem>
@@ -246,4 +256,6 @@ export default function Index() {
       <BackdropLoading loading={loading} />
     </Box>
   );
-}
+};
+
+export default Index;

@@ -1,110 +1,83 @@
 import { useContext, useEffect, useState } from 'react';
 import { Box, Typography, CardHeader, CardContent } from '@mui/material';
 import QRCode from 'react-qr-code';
+import Chart from 'chart.js/auto';
 import { Bar } from 'react-chartjs-2';
 import { ApiService } from 'services/api.service';
-import { AuthContext } from 'contexts/auth';
-import Chart from 'chart.js/auto';
-import * as S from './style';
+import { GlobalContext } from 'contexts/Global';
+import { ApplicationUtils } from 'utils/ApplicationUtils';
 import StepperCompany from './StepperCompany';
+import * as S from './style';
 
-
-const hexToRgba = (hex, alpha) => {
-  hex = hex.replace(/^#/, '');
-  const bigint = parseInt(hex, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  const clampedAlpha = Math.min(1, Math.max(0, alpha));
-  const rgba = `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`;
-  return rgba;
-};
 
 const Home = () => {
-  const { company } = useContext(AuthContext);
+  const { company } = useContext(GlobalContext);
   const apiService = new ApiService();
-
   const [barChartData, setBarChartData] = useState(null);
   const [doughnutChartData, setDoughnutChartData] = useState(null);
 
-  const getOrders = async () => {
+  const getOrdersDashboard = async () => {
     try {
-      const { data } = await apiService.get('/admin/orders-dashboard');
-      getDataOrders(data);
-      getDataProducts(data);
+      const { data } = await apiService.get('/admin/dashboard/orders');
+      setBarChartData({
+        labels: data.map(item => ApplicationUtils.formatDate(item.date, false, false)),
+        datasets: [
+          {
+            label: 'Quantidade de Pedidos',
+            backgroundColor: ApplicationUtils.convertHexToRgba(
+              company.custom.colorSecondary, 0.6
+            ) || 'rgba(75,192,192,0.4)',
+            borderColor: ApplicationUtils.convertHexToRgba(
+              company.custom.colorSecondary, 1
+            ) || 'rgba(75,192,192,1)',
+            borderWidth: 1,
+            hoverBackgroundColor: ApplicationUtils.convertHexToRgba(
+              company.custom.colorSecondary, 0.4
+            ) || 'rgba(75,192,192,0.4)',
+              hoverBorderColor: ApplicationUtils.convertHexToRgba(
+              company.custom.colorSecondary, 1
+            ) || 'rgba(75,192,192,1)',
+            data: data.map(item => item.quantity),
+          },
+        ],
+      });
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getDataOrders = (data) => {
-    const ordersByDate = data.reduce((acc, order) => {
-      const dateWithoutTime = new Date(order.date).toLocaleDateString();
-      acc[dateWithoutTime] = (acc[dateWithoutTime] || 0) + order.products.length;
-      return acc;
-    }, {});
-    const dates = Object.keys(ordersByDate);
-    const quantities = Object.values(ordersByDate);
+  const getTopSellingProducts = async () => {
+    try {
+      const { data } = await apiService.get('/admin/dashboard/products-topselling');
 
-    setBarChartData({
-      labels: dates,
-      datasets: [
-        {
-          label: 'Quantidade de Pedidos',
-          backgroundColor: hexToRgba(company.custom.colorSecondary, 0.6) || 'rgba(75,192,192,0.4)',
-          borderColor: hexToRgba(company.custom.colorSecondary, 1) || 'rgba(75,192,192,1)',
+      setDoughnutChartData({
+        labels: data.map(item => item.productName),
+        datasets: [{
+          label: 'Quant. Vendida',
+          backgroundColor: ApplicationUtils.convertHexToRgba(
+            company.custom.colorSecondary, 0.6
+          ) || 'rgba(75,192,192,0.2)',
+          borderColor: ApplicationUtils.convertHexToRgba(
+            company.custom.colorSecondary, 1
+          ) || 'rgba(75,192,192,1)',
           borderWidth: 1,
-          hoverBackgroundColor: 'rgba(75,192,192,0.6)',
-          hoverBorderColor: 'rgba(75,192,192,1)',
-          data: quantities,
-        },
-      ],
-    });
-  };
-
-  const getDataProducts = (orders) => {
-    const productCount = {};
-
-    const productNames = orders.reduce((acc, order) => {
-      order.products.forEach((product) => {
-        const productId = product.productId;
-        const productName = product.productName;
-        acc[productId] = productName;
+          hoverBackgroundColor: ApplicationUtils.convertHexToRgba(
+          company.custom.colorSecondary, 0.4
+          ) || 'rgba(75,192,192,0.4)',
+          hoverBorderColor: ApplicationUtils.convertHexToRgba(
+          company.custom.colorSecondary, 1
+          ) || 'rgba(75,192,192,1)',
+          data: data.map(item => item.quantity),
+        }],
       });
-      return acc;
-    }, {});
+    } catch {
 
-    orders.forEach((order) => {
-      order.products.forEach((product) => {
-        const productId = product.productId;
-        const productName = productNames[productId];
-        if (productCount[productName]) {
-          productCount[productName] += product.quantity;
-        } else {
-          productCount[productName] = product.quantity;
-        }
-      });
-    });
-
-    const labels = Object.keys(productCount);
-    const data = Object.values(productCount);
-
-    setDoughnutChartData({
-      labels,
-      datasets: [{
-        label: 'Quantidade Vendida',
-        backgroundColor: hexToRgba(company.custom.colorSecondary, 0.6) || 'rgba(75,192,192,0.2)',
-        borderColor: hexToRgba(company.custom.colorSecondary, 1) || 'rgba(75,192,192,1)',
-        borderWidth: 1,
-        hoverBackgroundColor: hexToRgba(company.custom.colorSecondary, 0.4) || 'rgba(75,192,192,0.4)',
-        hoverBorderColor: hexToRgba(company.custom.colorSecondary, 1) || 'rgba(75,192,192,1)',
-        data,
-      }],
-    });
+    }
   };
 
   useEffect(() => {
-    getOrders();
+    getOrdersDashboard();
+    getTopSellingProducts();
   }, []);
 
   return (
@@ -125,17 +98,30 @@ const Home = () => {
             </Box>
           </S.CardWelcome>
 
-          <Typography variant="h6">Ultímos 30 dias</Typography>
+          <Box>
+            <Typography variant="h6">Últimos 7 dias</Typography>
+          </Box>
+
           <S.SectionChart>
             <S.StyledCard>
-              <CardHeader title={<Typography variant="h6">Pedidos</Typography>} />
+              <CardHeader title={<Typography variant="h6">Novos pedidos</Typography>} />
               <CardContent>
                 <S.ChartContainer sx={{ width: '100%' }}>
                   {
                     (barChartData !== null) && <Bar
                       data={barChartData}
                       options={{
-                        scales: { x: { type: 'category' }, y: { beginAtZero: true, } },
+                        scales: { 
+                          x: { type: 'category' }, 
+                          y: {
+                            beginAtZero: true,
+                            ticks: {
+                              callback: function (value) {
+                                if (Number.isInteger(value)) return value;
+                              }
+                            }
+                          }
+                        },
                       }}
                     />
                   }
@@ -144,11 +130,26 @@ const Home = () => {
             </S.StyledCard>
 
             <S.StyledCard>
-              <CardHeader title={<Typography variant="h6">Mais vendidos</Typography>} />
+              <CardHeader title={<Typography variant="h6">Itens mais vendidos</Typography>} />
               <CardContent>
                 <S.ChartContainer sx={{ width: '100%' }}>
                   {(doughnutChartData !== null) &&
-                    <Bar data={doughnutChartData} options={{ indexAxis: 'y' }} />
+                    <Bar 
+                      data={doughnutChartData} 
+                      options={{ 
+                        indexAxis: 'y',  
+                        scales: { 
+                          x: { 
+                            precision: 0,
+                            ticks: {
+                              callback: function (value) {
+                                if (Number.isInteger(value)) return value;
+                              }
+                            }
+                          },
+                        } 
+                      }} 
+                    />
                   }
                 </S.ChartContainer>
               </CardContent>

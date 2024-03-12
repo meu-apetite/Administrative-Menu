@@ -1,13 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
 import { FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 import ButtonFloat from 'components/ButtonFloat';
 import BackdropLoading from 'components/BackdropLoading';
 
 const Payment_Pix = () => {
   const apiService = new ApiService();
-  const { toast, company, setCompany } = useContext(AuthContext);
+  const { toast, company, setCompany } = useContext(GlobalContext);
   const [data, setData] = useState({ active: null, key: null, keyType: null, city: null, name: null });
   const [loading, setLoading] = useState(false);
 
@@ -81,8 +81,7 @@ const Payment_Pix = () => {
 
   return (
     <section style={{ marginBottom: '48px' }}>
-      <p>
-Seus clientes podem comprar via PIX, recebendo um QR code com as informações da sua conta abaixo. Você é responsável pela verificação do pagamento.</p>
+      <p>Seus clientes podem comprar via PIX, recebendo um QR code com as informações da sua conta abaixo. Você é responsável pela verificação do pagamento.</p>
 
       <Grid container spacing={2}>
         <Grid item xs={12}>

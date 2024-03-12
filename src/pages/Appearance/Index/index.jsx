@@ -4,21 +4,20 @@ import { Avatar, TextField, Box, Grid, Tab, Tabs } from '@mui/material';
 import ButtonFloat from 'components/ButtonFloat';
 import BackdropLoading from 'components/BackdropLoading';
 import Header from 'components/Header';
+import { GlobalContext } from 'contexts/Global';
 import * as S from './style';
-import { AuthContext } from 'contexts/auth';
+
 
 const Create = () => {
   const apiService = new ApiService();
-  const { toast, company, setCompany } = useContext(AuthContext);
+  const { toast, company, setCompany } = useContext(GlobalContext);
   const [logo, setLogo] = useState();
   const [backgroundImage, setBackgroundImage] = useState();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [tabValue, setTabValue] = useState(0);
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
+  const handleTabChange = (event, newValue) => setTabValue(newValue);
 
   const save = async (e) => {
     try {

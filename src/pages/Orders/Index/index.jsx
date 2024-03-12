@@ -1,38 +1,39 @@
 import { useState, useEffect, useContext } from 'react';
+import jsPDFInvoiceTemplate, { OutputType } from "jspdf-invoice-template";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { 
-  Button, 
-  Chip, 
-  Menu, 
-  Pagination, 
-  Box, 
-  DialogActions, 
-  Select, 
-  Typography, 
-  Grid, 
-  DialogContentText, 
-  Dialog, 
-  DialogContent, 
-  MenuItem, 
-  DialogTitle 
+import {
+  Button,
+  Chip,
+  Menu,
+  Pagination,
+  Box,
+  DialogActions,
+  Select,
+  Typography,
+  Grid,
+  DialogContentText,
+  Dialog,
+  DialogContent,
+  MenuItem,
+  DialogTitle
 } from '@mui/material';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { ApiService } from 'services/api.service';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApplicationUtils } from 'utils/ApplicationUtils';
-import { ORDERSTATUS } from 'constants/orderStatus';
-import Header from 'components/Header';  
+import { ORDERSTATUS } from 'constants';
+import Header from 'components/Header';
 import Filter from 'components/Filter';
-import * as S from './style';
 import OrderDetailsModal from '../Details';
 import BackdropLoading from 'components/BackdropLoading';
+import * as S from './style';
 
 
 const filters = [
   {
-    name: 'search',
+    name: 'searchTerm',
     label: 'Pesquisa',
-    placeholder: 'Pesquise por pedido, cliente ou endereço...',
+    placeholder: 'Pedido, cliente ou endereço...',
     type: 'text'
   },
   {
@@ -52,13 +53,13 @@ const filters = [
     label: 'Status',
     placeholder: 'Status',
     type: 'select',
-    options: ORDERSTATUS.map(order => ({ value: order.name, label: order.label})),
+    options: ORDERSTATUS.map(order => ({ value: order.name, label: order.label })),
   },
 ];
 
 export default function Index() {
   const apiService = new ApiService();
-  const { toast } = useContext(AuthContext);
+  const { toast, company } = useContext(GlobalContext);
   const [orders, setOrders] = useState([]);
   const [currentOrder, setCurrentOrder] = useState(null);
   const [totalPages, setTotalPages] = useState([]);
@@ -79,7 +80,7 @@ export default function Index() {
   const modalChangeStatusClose = () => {
     setOpenModalDetails(false);
     setCurrentOrder(null);
-  }
+  };
 
   const modalDetailsOpen = (order, popupState) => {
     setCurrentOrder(order);
@@ -90,13 +91,13 @@ export default function Index() {
   const modalDetailsClose = () => {
     setOpenModalDetails(false);
     setCurrentOrder(null);
-  }
+  };
 
   const getFilters = async (filter) => {
     setFilter(filter);
     setPage(1);
-  }
-  
+  };
+
   const getOrders = async () => {
     try {
       setLoading('Carregando');
@@ -141,7 +142,80 @@ export default function Index() {
   const changePage = (event, value) => {
     setPage(value);
     window.scrollTo(0, 0);
-  }
+  };
+
+  const downloadInvoice = (order) => {
+    jsPDFInvoiceTemplate({
+      outputType: OutputType.Save,
+      returnJsPDFDocObject: true,
+      fileName: "Invoice 2021",
+      orientationLandscape: false,
+      compress: true,
+      logo: {
+        src: company.custom.logo.url,
+        type: 'PNG',
+        height: 20,
+        width: 20,
+        margin: { top: 0, left: 0 }
+      },
+      business: {
+        name: company.fantasyName,
+        address: company.address.freeformAddress,
+        phone: company.whatsapp,
+        email: company.email,
+      },
+      contact: {
+        name: order.client.name,
+        phone: order.client.phoneNumber,
+        email: order.client.email,
+      },
+      invoice: {
+        num: order.id,
+        label: 'Número do pedido #: ',
+        invDate: 'Data do pedido: ' + ApplicationUtils.formatDate(order.date),
+        headerBorder: false,
+        tableBodyBorder: true,
+        header: [
+          { title: 'Item', style: { width: 100 } },
+          { title: 'Preço', style: { height: 20 } },
+          { title: 'Quantidade', style: { height: 20 } },
+          { title: 'Total', style: { height: 20 } }
+        ],
+        table: order.products.map((item, index) => ([
+          item.productName,
+          item?.price ?? '-',
+          item.quantity,
+          item.priceTotal
+        ])),
+        additionalRows: [
+          { 
+            col1: 'Subtotal:', 
+            col2: ApplicationUtils.formatPrice(order.subtotal), 
+            style: { fontSize: 10 } 
+          },
+          { 
+            col1: 'Taxa de entrega:', 
+            col2:  order.deliveryType === 'customerPickup' 
+              ? 'A combinar' 
+              : order.deliveryType === 'pickup' 
+                ? 'R$ 0,00 (Retirada)'
+                : order.deliveryType === 'delivery' 
+                  ? ApplicationUtils.formatPrice(order.address.price)
+                  : '-',
+            style: { fontSize: 10 } 
+          },
+          { 
+            col1: 'Total:', 
+            col2:  ApplicationUtils.formatPrice(order.total), 
+            style: { fontSize: 14 } 
+          },
+        ],
+      },
+      footer: { text: company.slogan },
+      pageEnable: true,
+      pageLabel: "Pág ",
+    });
+  };
 
   useEffect(() => {
     getOrders();
@@ -175,13 +249,13 @@ export default function Index() {
                       <Button {...bindTrigger(popupState)}>Opções <KeyboardArrowDownIcon /></Button>
 
                       <Menu {...bindMenu(popupState)}>
-                      <S.MenuItemCuston onClick={() => modalDetailsOpen(item, popupState)}>
+                        <S.MenuItemCuston onClick={() => modalDetailsOpen(item, popupState)}>
                           <span className="fa fa-circle-info"></span> Ver detalhes
                         </S.MenuItemCuston>
                         <S.MenuItemCuston onClick={() => modalChangeStatusOpen(item, popupState)}>
                           <span className="fa fa-edit"></span> Alterar status
                         </S.MenuItemCuston>
-                        <S.MenuItemCuston onClick={popupState.close}>
+                        <S.MenuItemCuston onClick={() => downloadInvoice(item)}>
                           <span className="fa fa-file-pdf"></span> Baixar recibo
                         </S.MenuItemCuston>
                       </Menu>
@@ -201,7 +275,9 @@ export default function Index() {
                     <span>
                       <strong>Delivery: </strong>
                       {item.deliveryType === 'pickup' && 'Retirada'}
-                      {item.deliveryType === 'delivery' && item.address.freeformAddress}
+                      {item.deliveryType === 'delivery' 
+                        && (item.address.freeformAddress || `${item.address.street}, N°${item.address.number}, ${item.address.district} - ${item.address.city}`)
+                      }
                     </span>
                     <span>
                       <strong>Data: </strong>{' '}
@@ -254,14 +330,14 @@ export default function Index() {
             <Button onClick={modalChangeStatusClose}>Cancelar</Button>
             <Button onClick={changeStatus}>Confirmar</Button>
           </DialogActions>
-        </Dialog> 
+        </Dialog>
       )}
 
       {currentOrder && (
-        <OrderDetailsModal 
-          order={currentOrder} 
+        <OrderDetailsModal
+          order={currentOrder}
           modalView={openModalDetails}
-          modalViewClose={modalDetailsClose} 
+          modalViewClose={modalDetailsClose}
         />
       )}
 

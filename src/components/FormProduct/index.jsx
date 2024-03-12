@@ -3,7 +3,7 @@ import { FormControl, Grid, InputAdornment, InputLabel, MenuItem, OutlinedInput,
 import { useLocation } from 'react-router-dom';
 import { ApiService } from 'services/api.service';
 import { propsTextField } from 'utils/form';
-import { units } from 'utils/units';
+import { UNITS } from 'constants';
 import Select from '@mui/material/Select';
 import imageDefault from 'assets/images/default-placeholder.png';
 import * as S from './style';
@@ -63,15 +63,19 @@ const FormProduct = (props) => {
   
   useEffect(() => {
     getCategories();
+
+    const data = props?.initialData ? props.initialData : props.data;
+    const category = state?.categoryId ?? (data?.category || '');
     
-    if (props?.data?.images?.[0] instanceof File) {
+    if (data?.images?.[0] instanceof File) {
       setImageCurrent(URL.createObjectURL(props.data.images[0]));
-    } else if(props?.data?.images?.[0]) {
+    } else if(data?.images?.[0]) {
       setImageCurrent(props.data.images[0]);
     }
 
-    const category = state?.categoryId || props.data?.category || '';
-    setData({ ...props.data, category });
+    setData({ ...data, category });
+
+    props.getData(data);
   }, []);
 
   return (
@@ -165,7 +169,7 @@ const FormProduct = (props) => {
             label="Unidade de medida"
             fullWidth
           >
-            {units?.map((u) => (
+            {UNITS?.map((u) => (
               <MenuItem key={u.value} value={u.value}>
                 {u.text}
               </MenuItem>

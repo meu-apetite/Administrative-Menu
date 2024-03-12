@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Tab, Tabs, Box } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 import Header from 'components/Header';
 import ComplementProduct from 'components/ComplementProduct';
@@ -13,7 +13,7 @@ const Update = () => {
   const apiService = new ApiService();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { toast } = useContext(AuthContext);
+  const { toast } = useContext(GlobalContext);
   const [tabCurrent, setTabCurrent] = useState(0);
   const [complements, setComplements] = useState([]);
   const [complementsErrors, setComplementsErrors] = useState([]);

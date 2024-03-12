@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 import { Button, TextField } from '@mui/material';
 import * as S from './style';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 
 const AddressEdit = (props /* { getAddress(), address } */) => {
-  const { toast } = useContext(AuthContext);
+  const { toast } = useContext(GlobalContext);
   const initialAddress = {
     zipCode: null,
     city: null,

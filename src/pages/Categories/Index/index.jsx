@@ -4,18 +4,18 @@ import { Switch, Button,  Menu, Box, IconButton } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import Header from 'components/Header';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
-import * as S from './style';
 import ButtonFloat from 'components/ButtonFloat';
 import BackdropLoading from 'components/BackdropLoading';
+import * as S from './style';
 
 const Index = () =>  {
   const label = { inputProps: { 'aria-label': 'Color switch demo' } };
 
   const navigate = useNavigate();
   const apiService = new ApiService();
-  const { toast } = useContext(AuthContext);
+  const { toast } = useContext(GlobalContext);
   const [categories, setCategories] = useState([]);
   const [categoryChanges, setCategoryChanges] = useState([]);
   const [productChangeCurrent, setProductChangeCurrent] = useState(-1);
@@ -124,11 +124,10 @@ const Index = () =>  {
       const response = await apiService.put('/admin/categories', data);
 
       setCategories([]);
-      alert('ok')
       sortPosition(response.data);
       toast.success('Mudanças feitas com sucesso');
     } catch (error) {
-      console.log(error);
+      toast.error('Erro ao fazer mudanças');
     } finally {
       setLoading(false);
     }

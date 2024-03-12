@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Grid, TextField, } from '@mui/material';
 import Header from 'components/Header';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 import ButtonFloat from 'components/ButtonFloat';
 
@@ -10,14 +10,13 @@ const Create = () => {
   const apiService = new ApiService();
 
   const navigate = useNavigate();
-  const {setLoading, toast } = useContext(AuthContext);
+  const {setLoading, toast } = useContext(GlobalContext);
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
 
       const form = new FormData(e.target);
-      console.log(form)
 
       if (!form.get('title').trim().length) {
         return toast('Preencha o campo "Nome"', { icon: 'ℹ️' });

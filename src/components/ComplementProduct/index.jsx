@@ -92,6 +92,7 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
   };
 
   const maskFormat = (text) => {
+    text = text + '';
     const number = parseInt(text.replace(/\D/g, ''), 10);
     if (isNaN(number)) return 'R$ 0.00';
     return 'R$ ' + (number / 100).toFixed(2);
@@ -192,7 +193,7 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
                 </Grid>
 
                 {options.map((option, indexOption) => (
-                  <S.WrapperOption>
+                  <S.WrapperOption key={`option-${indexOption}`}>
                     <div className='info'>
                       <div>Opção {(indexOption + 1)}</div>
                     </div>
@@ -208,7 +209,7 @@ const ComplementProduct = ({ complementsValue, getValue }) => {
                       {...propsTextField}
                       margin="none"
                       label="Valor adicional"
-                      value={complements[index]['options'][indexOption]['priceFormat']}
+                      value={maskFormat(complements[index]['options'][indexOption]['price'])}
                       onChange={(e) => {
                         setValueOption(index, indexOption, 'priceFormat', maskFormat(e.target.value));
                         setValueOption(

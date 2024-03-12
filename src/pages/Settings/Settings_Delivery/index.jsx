@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { FormControl, Grid, InputLabel, MenuItem, TextField } from '@mui/material';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 import * as S from './style';
 import ButtonFloat from 'components/ButtonFloat';
@@ -8,7 +8,7 @@ import BackdropLoading from 'components/BackdropLoading';
 
 const Settings_Delivery = (props) => {
   const apiService = new ApiService();
-  const { toast, company, setCompany } = useContext(AuthContext);
+  const { toast, company, setCompany } = useContext(GlobalContext);
   const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState({

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Tab, Tabs, Box } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { ApiService } from 'services/api.service';
 import Header from 'components/Header';
 import ComplementProduct from 'components/ComplementProduct';
@@ -13,7 +13,7 @@ const Create = () => {
   const apiService = new ApiService();
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { toast } = useContext(AuthContext);
+  const { toast } = useContext(GlobalContext);
   const [tabCurrent, setTabCurrent] = useState(0);
   const [dataInit, setDataInit] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -60,9 +60,7 @@ const Create = () => {
           return c;
         })
         .filter(c => c.options && c.options.length > 0);
-    
-      console.log(newComplements);
-    
+        
       setComplements(newComplements);
     }
 
@@ -108,7 +106,11 @@ const Create = () => {
         unit: state.product.unit,
         images: []
       });
-      setComplements(state.product.complements);
+
+      console.log(state.product)
+      if (state.product?.complements.length > 0) {
+        setComplements(state.product.complements);
+      }
     }
   }, []);
 
@@ -124,11 +126,8 @@ const Create = () => {
       <Box component="section" sx={{ mb: '48px' }}>
         {tabCurrent === 0 && (
           (state?.duplicate)
-            ? dataInit &&
-            <FormProduct
-              initialData={dataInit}
-              getData={data => setData(data)}
-            />
+            ? dataInit 
+                && <FormProduct initialData={dataInit} getData={data => setData(data)} />
             : <FormProduct
               data={data}
               getData={data => setData(data)}

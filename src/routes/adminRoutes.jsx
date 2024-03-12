@@ -1,5 +1,4 @@
 import { Navigate } from 'react-router-dom';
-import Layout from 'components/Layout';
 import Address from 'pages/Address/Index';
 import Product from 'pages/Products/Index';
 import ProductCreate from 'pages/Products/Create';
@@ -20,11 +19,12 @@ import Settings_InfoAdmin from 'pages/Settings/Settings_InfoAdmin';
 import Payment_InDelivery from 'pages/PaymentMethod/Payment_InDelivery';
 import Financial from 'pages/Financial/Index';
 import Terms from 'pages/Terms';
+import AdminLayout from 'layouts/Admin';
 
 const adminRoutes = [
   {
     path: '/',
-    element: <Layout />,
+    element: <AdminLayout />,
     children: [
       { path: '', element: <Home /> },
       { path: 'home', element: <Home /> },

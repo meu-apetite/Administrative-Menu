@@ -20,7 +20,7 @@ import {
   Paper
 } from '@mui/material';
 import { Avatar, CardHeader, styled } from '@mui/material';
-import { AuthContext } from 'contexts/auth';
+import { GlobalContext } from 'contexts/Global';
 import { menuItems } from './items';
 import * as S from './style';
 
@@ -31,7 +31,7 @@ const MiniDrawer = () => {
   const [openMenuProfile, setOpenMenuProfile] = useState(false);
   const [routeActive, setRouteActive] = useState('home');
   const [currentLeft, setCurrentLeft] = useState('home');
-  const { company, changeTheme, themeMode } = useContext(AuthContext);
+  const { company, changeTheme, themeMode } = useContext(GlobalContext);
 
   const handleDrawerOpen = () => setOpen(true);
 
@@ -136,7 +136,7 @@ const MiniDrawer = () => {
         </Toolbar>
 
         {openMenuProfile &&
-          <Paper sx={{ maxWidth: '250px', position: 'absolute', right: 0, top: '65px' }}>
+          <S.PaperMenuCustom>
             <MenuList>
               {menuItemsProfile.map((item, index) => (
                 <MenuItem onClick={item.action} key={index} sx={{ gap: '8px', wordWrap: 'break-word' }}>
@@ -144,14 +144,14 @@ const MiniDrawer = () => {
                 </MenuItem>
               ))}
             </MenuList>
-          </Paper>
+          </S.PaperMenuCustom>
         }
       </S.AppBar>
 
       <S.Drawer variant="permanent" open={open}>
         <S.DrawerHeader>
           <S.ButtonToggle
-            themeMode={themeMode}
+            thememode={themeMode}
             onClick={() => changeTheme(themeMode === 'dark' ? 'light' : 'dark')}
             startIcon={<i className="fa-solid fa-circle-half-stroke"></i>}
           >
@@ -178,15 +178,19 @@ const MiniDrawer = () => {
                 <S.MenuItem
                   key={index}
                   disablePadding
+                  open={open} 
                   className={routeActive === item.link ? 'active-item' : ''}
                   onClick={() => toLink(item.link)}
                 >
-                  <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5 }}>
-                    <ListItemIcon title={item.text} sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
+                  <S.ListItemButtonCustom open={open}>
+                    <ListItemIcon 
+                      title={item.text} 
+                      sx={{ justifyContent: 'center' }}
+                    >
                       <item.Icon />
                     </ListItemIcon>
                     <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-                  </ListItemButton>
+                  </S.ListItemButtonCustom>
                 </S.MenuItem>
               ))}
             </List>
