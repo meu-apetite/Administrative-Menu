@@ -13,6 +13,8 @@ import {
   FormControlLabel,
   Typography,
   Container,
+  Modal,
+  DialogContent,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { ThemeProvider } from '@mui/material/styles';
@@ -20,6 +22,7 @@ import { ApiService } from 'services/api.service';
 import { AuthContext } from 'contexts/auth';
 import * as S from './style';
 import BackdropLoading from 'components/BackdropLoading';
+import Terms from 'pages/Terms';
 
 const Register = () => {
   const apiService = new ApiService(false);
@@ -27,6 +30,7 @@ const Register = () => {
   const { toast } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [terms, setTerms] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [data, setData] = useState({
     email: '',
     password: '',
@@ -191,8 +195,8 @@ const Register = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControlLabel
-                  control={<Checkbox value={terms} onChange={() => setTerms(true)} color="primary" />}
-                  label={<Link href="terms">Eu aceito todos os termos.</Link>}
+                  control={<Checkbox value={terms} onChange={() => setTerms(!terms)} color="primary" />}
+                  label={<Link href="/terms" target="blank">Eu aceito todos os termos.</Link>}
                 />
               </Grid>
 

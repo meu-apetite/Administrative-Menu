@@ -84,7 +84,7 @@ const MiniDrawer = () => {
 
       if (buttonFloat && appMain && isWidthGreaterThan900 && open) {
         if (open) {
-          buttonFloat.style.left = `calc(50% + ${((240 / window.innerWidth) * 100)}% - ${buttonFloat.clientWidth / 1.2}px)`;
+          buttonFloat.style.left = `calc(50% + ${((256 / window.innerWidth) * 100)}% - ${buttonFloat.clientWidth / 1.2}px)`;
           buttonFloat.style.transform = 'initial';
         } else {
           buttonFloat.style.transform = 'translateX(-50%)';

@@ -111,7 +111,6 @@ export default function Index() {
     } catch (e) {}
   };
 
-
   useEffect(() => {
     getProducts();
     getCategories();

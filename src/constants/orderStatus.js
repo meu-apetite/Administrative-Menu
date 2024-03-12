@@ -1,4 +1,4 @@
-export const orderStatus = [
+export const ORDERSTATUS = [
   { name: "OrderReceived", label: "Pedido Recebido" },
   { name: "Processing", label: "Em Processamento" },
   { name: "WaitingForPaymentConfirmation", label: "Aguardando Pagamento" },

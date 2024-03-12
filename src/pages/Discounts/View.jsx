@@ -5,7 +5,6 @@ import Grid from '@mui/material/Grid'
 import TextField from '@mui/material/TextField'
 import ButtonUpload from 'components/ButtonUpload'
 import Gallery from 'components/Gallery'
-import convertFile from 'utils/convertBase64'
 import Category from '@mui/icons-material/Category'
 
 const Create = () => {
@@ -22,11 +21,7 @@ const Create = () => {
   }
 
   //Load images
-  const loadFile = async (e) => {
-    const file = e.target.files[0]
-    const fileBase64 = await convertFile(file)
-    setImages([{ img: fileBase64, title: file.name }])
-  }
+  const loadFile = async (e) => { }
 
   const closeImage = (id) =>
     setImages((items) => items.filter((item) => item.id !== id))

@@ -2,7 +2,7 @@ import { Container, Typography } from '@mui/material';
 
 const Terms = () => {
   return (
-    <Container maxWidth="md" style={{ marginTop: '50px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
+    <Container maxWidth="md" style={{ background: '#fff', color: '#000', padding: '20px' }}>
       <Typography variant="h5" gutterBottom>
         Termos de Uso
       </Typography>

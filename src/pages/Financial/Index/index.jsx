@@ -4,6 +4,7 @@ import {
   Select,
   MenuItem,
   Grid,
+  Button,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { ApiService } from 'services/api.service';
@@ -77,7 +78,7 @@ const Index = () => {
       <Header title="Financeiro" buttonText="Atualizar" />
 
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={6} sm={6}>
           <Select value={dateRange} onChange={handleDateRangeChange} fullWidth>
             <MenuItem value="all">Todos</MenuItem>
             <MenuItem value="day">Dia</MenuItem>
@@ -85,6 +86,12 @@ const Index = () => {
             <MenuItem value="month">Mês</MenuItem>
             <MenuItem value="custom">Personalizado</MenuItem>
           </Select>
+        </Grid>
+
+        <Grid item xs={6} sm={6}>
+          <Button variant="contained" onClick={getFinancialData}>
+            Buscar
+          </Button>
         </Grid>
 
         {dateRange === 'custom' && (

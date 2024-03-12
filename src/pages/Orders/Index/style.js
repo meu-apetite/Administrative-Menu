@@ -1,10 +1,11 @@
-import { Button, Card, CardContent, CardMedia, MenuItem, Paper } from '@mui/material';
+import { Card, CardContent, MenuItem } from '@mui/material';
 import { styled } from '@mui/system';
 
-export const ContainerProducts = styled('main')({
+export const ContainerMain = styled('main')({
+  marginTop: 32,
   display: 'flex',
   flexDirection: 'column',
-  gap: 32
+  gap: 24
 });
 
 export const ModalContainer = styled('div')({
@@ -43,12 +44,6 @@ export const CardCustom = styled(Card)({
   boxShadow: '-1px 1px 1px rgba(0, 0, 0, 0.09)',
 });
 
-export const CardMediaCustom = styled(CardMedia)({
-  width: 100,
-  height: 100,
-  borderRadius: 6
-});
-
 export const CardContentCustom = styled(CardContent)({
   display: 'grid',
   gap: '16px',
@@ -58,7 +53,6 @@ export const CardContentCustom = styled(CardContent)({
 export const CardInfo = styled('div')({
   display: 'flex',
   flexDirection: 'column'
-
 });
 
 export const Description = styled('p')({
@@ -91,88 +85,4 @@ export const WrapperAction = styled('div')(({ theme }) => ({
 export const MenuItemCuston = styled(MenuItem)({
   display: 'flex',
   gap: 8
-});
-
-export const CustomPaper = styled(Paper)({
-  padding: '20px', 
-  margin: '20px auto',
-  width: '100%',
-  maxWidth: 800
-});
-
-export const ProductInfo = styled(Paper)({
-  border: 'none', 
-  borderBottom: '1px solid #ccc', 
-  marginTop: 12,
-  marginBottom: 12,
-  display: 'grid', 
-  gridTemplateColumns: '1fr 80px',
-  justifyContent: 'space-between',
-  'img': {
-    height: '100%',
-    width: '100%',
-    maxWidth: '100px',
-    objectFit: 'cover'
-  }
-});
-
-export const SearchContainer = styled('div')(({ theme }) => ({
-  display: 'flex',
-  input: {
-    flex: 1,
-    padding: '8px',
-    marginRight: '8px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-  },
-  button: {
-    padding: '8px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-}));
-
-export const FilterContainer = styled('div')(({ theme }) => ({
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: '8px',
-  alignItems: 'end',
-  margin: `${theme.spacing(1)} 0 ${theme.spacing(5)}`,
-
-  '& > *': {
-    margin: 0,
-  },
-
-  label: {
-    fontSize: 'small'
-  },
-  input: {
-    padding: '8px',
-    marginRight: '8px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-  },
-  select: {
-    height: '35px',
-    padding: '8px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-  },
-  button: {
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-}));
-
-
-export const CustomButton = styled(Button)({
-  '&:hover': {
-    backgroundColor: 'rgba(0, 123, 255, 0.8)'
-  },
 });
