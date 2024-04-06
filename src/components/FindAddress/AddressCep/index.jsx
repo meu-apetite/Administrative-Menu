@@ -13,8 +13,10 @@ const AddressCep = (props /* { getAddress() } */) => {
     try {
       setLoading(true);
 
-      const cepRegex = /^[0-9]{8}$/;
-      if (!cepRegex.test(cep)) return toast.error('Cep incorreto');
+      const numberCep = cep?.replace(/\D/g, "");
+
+      if (numberCep.toString().length !== 8) return toast.error('Cep incorreto');
+
       const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
 
       if (response.data?.erro) return toast.error('Cep incorreto');
