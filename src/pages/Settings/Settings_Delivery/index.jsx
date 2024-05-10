@@ -91,7 +91,7 @@ const Settings_Delivery = (props) => {
             onChange={(e) => setData({ ...data, allowStorePickup: e.target.value })}
           >
             <MenuItem sx={{ whiteSpace: 'unset', wordBreak: 'break-all' }} value={true}>
-              Permitir retirada na loja: os clientes podem pegar os pedidos pessoalmente
+              Permitir retirada na loja
             </MenuItem>
             <MenuItem sx={{ whiteSpace: 'unset', wordBreak: 'break-all' }} value={false}>
               Não permitir retirada na loja
